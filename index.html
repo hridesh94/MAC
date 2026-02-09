@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MAC</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d41132",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#181112",
+                        "charcoal": "#221013",
+                        "blush": "#b99da1",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-charcoal dark:text-white transition-colors duration-300 smooth-scroll">
+
+    <!-- Fixed Navigation -->
+    <header
+        class="fixed top-0 left-0 right-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-blush/20">
+        <div class="max-w-[1200px] mx-auto px-6 lg:px-10">
+            <div class="flex items-center justify-between py-5">
+                <!-- Logo -->
+                <a href="#" onclick="showMainSite(); return false;" class="flex items-center gap-4 group">
+                    <div class="text-primary size-6 transition-transform group-hover:rotate-45 duration-300">
+                        <span class="material-symbols-outlined text">join_inner</span>
+                    </div>
+                    <h2 class="text-xl font-bold leading-tight tracking-widest">MAC</h2>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-9">
+                    <a class="nav-link text-sm font-medium hover:text-primary transition-colors" href="#home"
+                        onclick="showMainSite()">Home</a>
+                    <a class="nav-link text-sm font-medium hover:text-primary transition-colors"
+                        href="#philosophy">Philosophy</a>
+                    <a class="nav-link members-only text-sm font-medium hover:text-primary transition-colors"
+                        href="#events" style="display: none;">Events</a>
+                    <a class="nav-link text-sm font-medium hover:text-primary transition-colors"
+                        href="#membership">Membership</a>
+                </nav>
+
+                <!-- CTA Buttons -->
+                <div class="hidden md:flex items-center gap-4">
+                    <button onclick="navigateTo('login')"
+                        class="flex min-w-[120px] cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold leading-normal hover:opacity-90 transition-opacity">
+                        <span>Member Login</span>
+                    </button>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-blush/30"
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAcBUfnYtL9lAnAW7A87ZsxOQAlVmnaaMAuS-HBv9MEeyZZUqFiAheKCVJAEXdbvcDsaVaBpWKi1sFNJdJaFpPmC8FeEFaRwEPZQ4XLHFBl2BxyDibGbMvu2CUt2i1MLr0tmQHgSM4XEeOz5GRcJH0QvU5nwrtCQdHnQdM__1FAIgzWcghu6p_ZVEt4mAL9Av2cgu-y-mBkMsSLaTMSMOEHtc_tTjxzDdbfq979cyJnzlYd_dwu_Jg1sZ1uNoayaCeilBCdhPyOuMkB");'>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-primary">
+                    <span class="material-symbols-outlined text-3xl">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu"
+        class="mobile-menu fixed top-0 right-0 bottom-0 w-full max-w-sm bg-charcoal z-50 md:hidden shadow-2xl">
+        <div class="flex flex-col h-full">
+            <div class="flex justify-between items-center p-6 border-b border-blush/20">
+                <span class="text-xl font-bold">Menu</span>
+                <button onclick="toggleMobileMenu()" class="text-primary">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <nav class="flex flex-col gap-6 p-6">
+                <a onclick="toggleMobileMenu(); showMainSite();"
+                    class="text-lg font-medium hover:text-primary transition-colors" href="#home">Home</a>
+                <a onclick="toggleMobileMenu()" class="text-lg font-medium hover:text-primary transition-colors"
+                    href="#philosophy">Philosophy</a>
+                <a onclick="toggleMobileMenu()"
+                    class="members-only text-lg font-medium hover:text-primary transition-colors" href="#events"
+                    style="display: none;">Events</a>
+                <a onclick="toggleMobileMenu()" class="text-lg font-medium hover:text-primary transition-colors"
+                    href="#membership">Membership</a>
+            </nav>
+            <div class="mt-auto p-6 border-t border-blush/20">
+                <button onclick="navigateTo('login')"
+                    class="w-full flex items-center justify-center rounded-lg h-12 px-5 bg-primary text-white text-sm font-bold">
+                    Member Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Site Container -->
+    <div id="mainSite" class="page-transition page-visible">
+        <!-- Main Content -->
+        <main class="pt-20">
+
+            <!-- HOME SECTION -->
+            <section id="home"
+                class="page-section active min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                    style='background-image: linear-gradient(rgba(24, 17, 18, 0.6) 0%, rgba(24, 17, 18, 0.8) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDA68o1G9Nu8tWQLFxSlZXxeGu0BWRq5X8kKA6jKBPE6DRDs0pJnbKUo5Q7-xeuaIXg6G30BOQvw90aGzVED8KBIvUQDZeSfDAwe9SNU84ouxSjdjLxLFkHnqtc1ghYvzDIF3odm8TOfzVCIxQ2fm61QsRHMdZ0vhSkzra6nY6yXv8FAlnJSbOYp79olGt3Ntj6WbzHUzVyOeP5uarfE0D8DzVPZETkijnhI0XNueKCgnwHHDYwf9vxNstBkRpxLtFPMu-xJNgyBK-o");'>
+                </div>
+
+                <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+                    <h1
+                        class="hero-title text-white text-8xl md:text-9xl font-light italic font-serif leading-tight tracking-tight mb-6 fade-in-up opacity-0">
+                        The Limitless
+                    </h1>
+                    <h2
+                        class="text-white/80 text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto mb-8 fade-in-up opacity-0 stagger-2">
+                        Experiences curated for those who operate beyond limits. The intersection of luxury and peak
+                        performance.
+                    </h2>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in-up opacity-0 stagger-3">
+                        <button onclick="scrollToSection('philosophy')"
+                            class="flex min-w-[180px] cursor-pointer items-center justify-center rounded-full h-14 px-8 border border-white/30 bg-white/5 backdrop-blur-md text-white text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-all hover-scale">
+                            Discover MAC
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Scroll Indicator -->
+                <div
+                    class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce fade-in-up opacity-0 stagger-4">
+                    <span class="material-symbols-outlined text-white text-3xl">keyboard_double_arrow_down</span>
+                </div>
+            </section>
+
+            <!-- PHILOSOPHY SECTION -->
+            <section id="philosophy" class="page-section py-20 lg:py-32 px-6 lg:px-40">
+                <div class="max-w-[1200px] mx-auto">
+                    <!-- Header -->
+                    <div class="text-center mb-16">
+                        <span class="text-primary small-caps font-bold tracking-[0.3em] text-xs">A New Standard</span>
+                        <h2
+                            class="section-title text-4xl md:text-5xl font-light font-serif italic leading-tight mt-4 mb-6">
+                            Our Philosophy</h2>
+                        <p class="text-lg md:text-xl font-light leading-relaxed max-w-3xl mx-auto opacity-80 italic">
+                            MAC is more than a club; it is a declaration of independence from the mundane. We believe in
+                            the pursuit of adrenaline through the lens of extreme refinement.
+                        </p>
+                    </div>
+
+                    <!-- Values Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+                        <div class="group relative bg-cover bg-center flex flex-col gap-3 rounded-xl justify-end p-8 aspect-[3/4] overflow-hidden hover-scale"
+                            style='background-image: linear-gradient(0deg, rgba(34, 16, 19, 0.8) 0%, rgba(34, 16, 19, 0) 50%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBvg1GTEdzKN0fTH3WdzIDKOi3suiG7l_ttLE_4fXTyyuffK9fVnFBaA8RaLpeFVPXM0w3nvUzRp_WaXOtbrtvFJfux_gFZSWXaICIF5MlzceKcGWIYwvaQnq33JBfEGFtC0i2fhDWEfdhPLcZ4BNOui99GKluB7GUa7osH-MlbvPjbl3xS0PThOcF37pYRUCdJaFYPYPm-uYxre_xZaDkOyGh6tQNLjPthsla0iualCRWTDE5Y2-QuMW7tt34lLTrq6qmuzkC1WG3q");'>
+                            <div
+                                class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <span class="text-primary small-caps text-xs">Value 01</span>
+                                <p class="text-white text-2xl font-light font-serif italic leading-tight mt-2">Heritage
+                                </p>
+                                <p
+                                    class="text-white/60 text-sm mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                    Built on decades of uncompromising excellence.</p>
+                            </div>
+                        </div>
+
+                        <div class="group relative bg-cover bg-center flex flex-col gap-3 rounded-xl justify-end p-8 aspect-[3/4] overflow-hidden hover-scale"
+                            style='background-image: linear-gradient(0deg, rgba(34, 16, 19, 0.8) 0%, rgba(34, 16, 19, 0) 50%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCo1gEaPhXN4U-hUfH0BT07PkZ1-hZ4309rG0WLsWgVSVx4yV9Nb7GjDs-31Bv2grbi5n7HxWV3OgIK3AJQy9zp0TltE8go6jrJ-36H5rXe4lfdFUs1uToCHUxl4QewCn94lFCgzvKc6rb0jes2eqfIz8W9jEEgOjM3ac338nM2K1OGSD1arqcLNH_zcO5RUTJVRqAUv3rVHBRTBK-yEsWHSKGliwsKAbje-NKzZE1m5eslNFRDR4nlvwCEaD1NecrqE5R5W7nUl9Di");'>
+                            <div
+                                class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <span class="text-primary small-caps text-xs">Value 02</span>
+                                <p class="text-white text-2xl font-light font-serif italic leading-tight mt-2">Precision
+                                </p>
+                                <p
+                                    class="text-white/60 text-sm mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                    The intersection of art and absolute technical mastery.</p>
+                            </div>
+                        </div>
+
+                        <div class="group relative bg-cover bg-center flex flex-col gap-3 rounded-xl justify-end p-8 aspect-[3/4] overflow-hidden hover-scale"
+                            style='background-image: linear-gradient(0deg, rgba(34, 16, 19, 0.8) 0%, rgba(34, 16, 19, 0) 50%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBheuIjXWKPkmUZ2NWqitfIElbEwMHcp7FNaA0q4VJK8NeizNK2VJlRrIn-LdFKhXPDRk7dMpZHHG4MHsdGMfSUcu21xJcA6EZBdslOwdn7-YxXHZUXv5CTTVyGsmLPfFsgkjwR0ZDN1T479h0HQNYavmYe1eL5Lx2p_Sv7NXN6-_vcy3S5KE-_x5H_UdqxEXjKebGW1G829bb3UjBM6SGDTvhI2-vscFI4T1v6uY_fhX8JaQx0olbdcVD8krhuBEhUuj4G52deKg_s");'>
+                            <div
+                                class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <span class="text-primary small-caps text-xs">Value 03</span>
+                                <p class="text-white text-2xl font-light font-serif italic leading-tight mt-2">
+                                    Adrenaline</p>
+                                <p
+                                    class="text-white/60 text-sm mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                    Living at the edge of the possible.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Split Content -->
+                    <div
+                        class="flex flex-col lg:flex-row gap-12 items-center bg-background-light/50 dark:bg-charcoal/30 rounded-xl p-8 lg:p-12">
+                        <div class="flex-1 space-y-6">
+                            <span class="text-primary small-caps font-bold tracking-widest text-xs">Quiet
+                                Authority</span>
+                            <h3 class="text-3xl md:text-4xl font-light font-serif italic">The Art of the Undisclosed
+                            </h3>
+                            <p class="text-base md:text-lg font-light leading-relaxed opacity-80">
+                                True luxury doesn't scream; it whispers in rooms where names are never spoken, only
+                                known. MAC provides the theater for these moments, curated with high-fashion aesthetics
+                                and cinematic precision.
+                            </p>
+
+                        </div>
+                        <div class="flex-1 w-full">
+                            <div class="aspect-video bg-cover bg-center rounded-xl shadow-2xl hover-scale"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCffhxTlDmhGAjfK_nadhKv5XTo-N2vivZpiFnl5rruy6RqjIMKIiWDwbUHA4GMGD6bSShiHBD5-BunZlvxPFdcwDToMLf0Fd8m9FN0ReR574E_nYfYW9NKJXBurWDNbRkQocvpLqvDi3nsI3P12TeLgV_bcoYTDO8rmZeXfR9418m6hhRN3cISQe06w0sEVnK8YcAqGJwuiapYsEJFq3c6nlq7dALPeJOzFEL88MuHNp1Built7TQTztupwIzLRINrAQnFwMWUwngy");'>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- EVENTS CALENDAR SECTION -->
+            <section id="events" class="page-section py-20 lg:py-32 px-6 lg:px-40 members-only" style="display: none;">
+                <div class="max-w-[1100px] mx-auto">
+                    <div class="text-center mb-16">
+                        <p class="text-primary dark:text-blush text-xs font-bold uppercase-tracking pb-4">Exclusive
+                            Members-Only Adrenaline Calendar</p>
+                        <h1 class="section-title text-4xl md:text-6xl font-serif italic font-bold leading-tight pb-6">
+                            Limitless Events</h1>
+                        <div class="w-24 h-1 bg-primary mx-auto"></div>
+                    </div>
+
+                    <!-- Events Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <!-- Events populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- MEMBERSHIP CTA SECTION -->
+            <section id="membership" class="page-section py-20 lg:py-32 px-6 lg:px-40 bg-primary/5">
+                <div class="max-w-[1200px] mx-auto">
+                    <div class="flex flex-col items-center gap-10 text-center">
+                        <div class="flex flex-col gap-4 max-w-2xl">
+                            <h1
+                                class="section-title text-4xl md:text-6xl font-serif italic font-light leading-tight tracking-tight">
+                                The Inner Circle
+                            </h1>
+                            <p class="opacity-70 text-lg font-light leading-relaxed">
+                                Membership is by invitation only. Access credentials are issued exclusively by our
+                                administration to those who embody the MAC ethos.
+                            </p>
+                            <p class="opacity-50 text-sm font-light leading-relaxed italic">
+                                If you have received an invitation, your credentials have been provided directly.
+                            </p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
+                            <button onclick="navigateTo('login')"
+                                class="flex min-w-[240px] cursor-pointer items-center justify-center rounded-full h-16 px-10 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">
+                                Member Access
+                            </button>
+                            <button onclick="scrollToSection('philosophy')"
+                                class="flex min-w-[240px] cursor-pointer items-center justify-center rounded-full h-16 px-10 border-2 border-primary text-primary text-sm font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all hover-scale">
+                                Explore Our Philosophy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="bg-charcoal/50 backdrop-blur-md border-t border-blush/10 py-16 px-6 lg:px-40">
+            <div class="max-w-[1100px] mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-2xl">join_inner</span>
+                            <span class="font-bold small-caps tracking-[0.4em] text-xl">MAC</span>
+                        </div>
+                        <p class="text-sm opacity-60 leading-relaxed">
+                            The MAC. Established 2026. Member admissions only.
+                        </p>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold uppercase tracking-widest opacity-60">Quick Links</h3>
+                        <nav class="flex flex-col gap-3">
+                            <a href="#philosophy" class="text-sm hover:text-primary transition-colors">The
+                                Philosophy</a>
+                            <a href="#events" class="members-only text-sm hover:text-primary transition-colors"
+                                style="display: none;">Events Calendar</a>
+                            <a href="#membership" class="text-sm hover:text-primary transition-colors">Membership</a>
+                        </nav>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold uppercase tracking-widest opacity-60">Connect</h3>
+                        <div class="flex gap-1">
+                            <a href="mailto:hello@mac-experiences.com" class="hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined">mail</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Bottom -->
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 border-t border-blush/20">
+                    <p class="text-xs uppercase tracking-[0.3em] opacity-40">© 2026 MAC. All rights reserved.</p>
+                    <div class="flex gap-6 text-xs uppercase tracking-widest opacity-60">
+                        <a href="#" class="hover:text-primary transition-colors">Privacy</a>
+                        <a href="#" class="hover:text-primary transition-colors">Terms</a>
+                        <a href="#" class="hover:text-primary transition-colors">Inquiries</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Super Admin Dashboard Container -->
+    <div id="adminDashboard" style="display: none;">
+        <!-- Admin Header -->
+        <nav class="fixed w-full z-50 transition-all duration-300 bg-black/80 backdrop-blur-md border-b border-white/10"
+            id="adminNavbar">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex justify-between items-center h-24">
+                    <!-- Logo -->
+                    <a href="#" class="flex items-center gap-4 group">
+                        <div class="text-amber-500 size-6 transition-transform group-hover:rotate-45 duration-300">
+                            <span class="material-symbols-outlined text-3xl">join_inner</span>
+                        </div>
+                        <span class="text-2xl font-bold tracking-tighter">MAC <span
+                                class="text-amber-500 text-sm align-top ml-1">ADMIN</span></span>
+                    </a>
+
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:flex items-center gap-8">
+                        <button onclick="switchAdminTab('events')"
+                            class="admin-nav-link text-sm uppercase tracking-widest hover:text-amber-500 transition-colors text-amber-500"
+                            id="nav-events">Events</button>
+                        <button onclick="switchAdminTab('members')"
+                            class="admin-nav-link text-sm uppercase tracking-widest hover:text-amber-500 transition-colors opacity-60"
+                            id="nav-members">Members</button>
+                        <button onclick="switchAdminTab('registrations')"
+                            class="admin-nav-link text-sm uppercase tracking-widest hover:text-amber-500 transition-colors opacity-60"
+                            id="nav-registrations">Status</button>
+                        <button onclick="handleLogout()"
+                            class="px-6 py-2 border border-amber-500/50 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Admin Content -->
+        <div class="pt-32 px-6 pb-20 max-w-7xl mx-auto">
+            <!-- Welcome Section -->
+            <div class="mb-12">
+                <h1 class="text-4xl md:text-5xl font-serif italic mb-4">Admin Dashboard</h1>
+                <p class="text-white/60">Manage events, members, and platform content.</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="glass-card p-6 rounded-xl border border-white/5 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all">
+                    </div>
+                    <h3 class="text-sm uppercase tracking-widest opacity-60 mb-2">Total Events</h3>
+                    <div class="text-4xl font-bold" id="adminTotalEvents">0</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl border border-white/5 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all">
+                    </div>
+                    <h3 class="text-sm uppercase tracking-widest opacity-60 mb-2">Active Members</h3>
+                    <div class="text-4xl font-bold" id="adminTotalMembers">0</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl border border-white/5 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all">
+                    </div>
+                    <h3 class="text-sm uppercase tracking-widest opacity-60 mb-2">Registrations</h3>
+                    <div class="text-4xl font-bold" id="adminTotalRegistrations">0</div>
+                </div>
+            </div>
+
+            <!-- Events Management Tab -->
+            <div id="admin-tab-events" class="admin-tab-content">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-serif italic">Events Management</h2>
+                    <button onclick="openAddEventModal()"
+                        class="flex items-center gap-2 px-6 py-3 bg-amber-500 text-black rounded-full font-bold uppercase tracking-widest text-xs hover:shadow-lg hover:shadow-amber-500/20 transition-all">
+                        <span class="material-symbols-outlined text-lg">add</span>
+                        Add Event
+                    </button>
+                </div>
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-white/5 text-xs uppercase tracking-widest">
+                                <tr>
+                                    <th class="p-6">Event Details</th>
+                                    <th class="p-6">Date & Location</th>
+                                    <th class="p-6">Participants</th>
+                                    <th class="p-6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5" id="adminEventsTable">
+                                <!-- Events populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Members Management Tab -->
+            <div id="admin-tab-members" class="admin-tab-content hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-serif italic">Members Credentials</h2>
+                    <button onclick="openAddMemberModal()"
+                        class="flex items-center gap-2 px-6 py-3 bg-amber-500 text-black rounded-full font-bold uppercase tracking-widest text-xs hover:shadow-lg hover:shadow-amber-500/20 transition-all">
+                        <span class="material-symbols-outlined text-lg">person_add</span>
+                        Issue Credential- (Coming Soon)
+                    </button>
+                </div>
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-white/5 text-xs uppercase tracking-widest">
+                                <tr>
+                                    <th class="p-6">Member Info</th>
+                                    <th class="p-6">Status</th>
+                                    <th class="p-6">Issued Date</th>
+                                    <th class="p-6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5" id="adminMembersTable">
+                                <!-- Members populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registration Status Tab -->
+            <div id="admin-tab-registrations" class="admin-tab-content hidden">
+                <h2 class="text-2xl font-serif italic mb-8">Registration Analytics</h2>
+                <div class="glass-card p-12 text-center rounded-xl border-dashed border-2 border-white/10">
+                    <span class="material-symbols-outlined text-6xl text-white/20 mb-4">analytics</span>
+                    <h3 class="text-xl font-bold mb-2">Analytics Dashboard</h3>
+                    <p class="text-white/60 max-w-md mx-auto">Registration trends and export functionality coming in
+                        next update.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MEMBERS DASHBOARD -->
+    <div id="membersDashboard" class="page-transition" style="display: none;">
+        <!-- Dashboard Header (matches existing header) -->
+        <header
+            class="fixed top-0 left-0 right-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-blush/20">
+            <div class="max-w-[1200px] mx-auto px-6 lg:px-10">
+                <div class="flex items-center justify-between py-5">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-4 group cursor-pointer" onclick="location.reload()">
+                        <div class="text-primary size-6 transition-transform group-hover:rotate-45 duration-300">
+                            <span class="material-symbols-outlined text">join_inner</span>
+                        </div>
+                        <h2 class="text-xl font-bold leading-tight tracking-widest">MAC</h2>
+                    </div>
+
+                    <nav class="hidden md:flex items-center gap-8">
+                        <a href="#dashboard-welcome" class="nav-link text-sm font-medium text-primary">Dashboard</a>
+                        <a href="#dashboard-events"
+                            class="nav-link text-sm font-medium hover:text-primary transition-colors">Available
+                            Events</a>
+                        <a href="#dashboard-my-events"
+                            class="nav-link text-sm font-medium hover:text-primary transition-colors">My Events</a>
+                    </nav>
+
+                    <button onclick="handleLogout()"
+                        class="flex items-center justify-center rounded-lg h-10 px-5 bg-primary/10 border border-primary text-primary text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all hover:opacity-90">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="pt-20">
+            <!-- Welcome Section -->
+            <section id="dashboard-welcome"
+                class="page-section min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                    style='background-image: linear-gradient(rgba(24, 17, 18, 0.6) 0%, rgba(24, 17, 18, 0.8) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDA68o1G9Nu8tWQLFxSlZXxeGu0BWRq5X8kKA6jKBPE6DRDs0pJnbKUo5Q7-xeuaIXg6G30BOQvw90aGzVED8KBIvUQDZeSfDAwe9SNU84ouxSjdjLxLFkHnqtc1ghYvzDIF3odm8TOfzVCIxQ2fm61QsRHMdZ0vhSkzra6nY6yXv8FAlnJSbOYp79olGt3Ntj6WbzHUzVyOeP5uarfE0D8DzVPZETkijnhI0XNueKCgnwHHDYwf9vxNstBkRpxLtFPMu-xJNgyBK-o");'>
+                </div>
+
+                <div class="relative z-10 text-center px-6 max-w-[900px] mx-auto">
+                    <h1
+                        class="text-5xl md:text-7xl lg:text-8xl font-serif italic font-bold leading-tight mb-6 fade-in-up">
+                        Welcome, <span id="memberGreeting">Member</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl opacity-80 mb-12 fade-in-up" style="animation-delay: 0.1s;">
+                        Your exclusive access to limitless experiences
+                    </p>
+
+                    <div class="glass-card inline-block p-8 rounded-2xl fade-in-up" style="animation-delay: 0.2s;">
+                        <div class="flex items-center gap-8 md:gap-12">
+                            <div class="text-center">
+                                <div class="text-4xl md:text-5xl font-bold text-primary mb-2" id="registeredCount">0
+                                </div>
+                                <div class="text-xs md:text-sm uppercase tracking-widest opacity-60">Events Registered
+                                </div>
+                            </div>
+                            <div class="h-12 w-px bg-blush/20"></div>
+                            <div class="text-center">
+                                <div class="text-4xl md:text-5xl font-bold text-blush mb-2">4</div>
+                                <div class="text-xs md:text-sm uppercase tracking-widest opacity-60">Available</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Available Events Section -->
+            <section id="dashboard-events" class="page-section py-20 lg:py-32 px-6 lg:px-40">
+                <div class="max-w-[1100px] mx-auto">
+                    <div class="text-center mb-16">
+                        <p class="text-primary dark:text-blush text-xs font-bold uppercase-tracking pb-4">Exclusive
+                            Members-Only Adrenaline Calendar</p>
+                        <h1 class="section-title text-4xl md:text-6xl font-serif italic font-bold leading-tight pb-6">
+                            Available Events</h1>
+                        <div class="w-24 h-1 bg-primary mx-auto"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12" id="availableEventsGrid">
+                        <!-- Events populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Events Section -->
+            <section id="dashboard-my-events" class="page-section py-20 lg:py-32 px-6 lg:px-40 bg-primary/5">
+                <div class="max-w-[1100px] mx-auto">
+                    <div class="text-center mb-16">
+                        <p class="text-primary dark:text-blush text-xs font-bold uppercase-tracking pb-4">Your Confirmed
+                            Experiences</p>
+                        <h1 class="section-title text-4xl md:text-6xl font-serif italic font-bold leading-tight pb-6">My
+                            Events</h1>
+                        <div class="w-24 h-1 bg-primary mx-auto"></div>
+                    </div>
+
+                    <div id="myEventsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <!-- Registered events populated by JavaScript -->
+                    </div>
+
+                    <div id="myEventsEmpty" class="text-center py-20" style="display: none;">
+                        <div class="glass-card p-12 rounded-2xl inline-block max-w-md">
+                            <span class="material-symbols-outlined text-6xl opacity-40 mb-6 block">calendar_month</span>
+                            <h3 class="text-2xl font-serif italic mb-4">No Events Registered</h3>
+                            <p class="opacity-60 mb-6 text-sm">Secure your spot in our exclusive experiences</p>
+                            <a href="#dashboard-events"
+                                class="inline-flex items-center justify-center rounded-full h-12 px-8 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">
+                                Browse Events
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Participation Confirmation Modal -->
+    <div id="participationModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
+        style="display: none;">
+        <div class="glass-card max-w-md w-full mx-4 p-8 rounded-2xl relative">
+            <button onclick="closeParticipationModal()"
+                class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="material-symbols-outlined text-primary text-3xl">check_circle</span>
+                </div>
+
+                <h3 class="text-2xl font-serif italic mb-4">Confirm Participation</h3>
+                <p class="opacity-80 mb-2 font-medium" id="confirmEventName">Event Name</p>
+                <p class="text-sm opacity-60 mb-8" id="confirmEventDate">Event Date</p>
+
+                <div class="flex gap-4">
+                    <button onclick="closeParticipationModal()"
+                        class="flex-1 rounded-full h-12 px-6 border-2 border-white/20 text-white text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-all">
+                        Cancel
+                    </button>
+                    <button onclick="confirmParticipation()"
+                        class="flex-1 rounded-full h-12 px-6 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div id="adminEventModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
+        style="display: none;">
+        <div class="glass-card max-w-2xl w-full mx-4 p-8 rounded-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeAddEventModal()"
+                class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <!-- Added ID 'modalTitle' here -->
+            <h2 id="modalTitle" class="text-2xl font-serif italic mb-6">Add New Event</h2>
+
+            <form onsubmit="handleAdminAddEvent(event)" class="space-y-6">
+                <input type="hidden" id="eventId" name="eventId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Event Title</label>
+                        <input type="text" name="title" required
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Category</label>
+                        <select name="category"
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                            <option value="Sand" class="bg-charcoal">Sand</option>
+                            <option value="Water" class="bg-charcoal">Water</option>
+                            <option value="Road" class="bg-charcoal">Road</option>
+                            <option value="Sky" class="bg-charcoal">Sky</option>
+                            <option value="Snow" class="bg-charcoal">Snow</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Date</label>
+                        <input type="text" name="date" placeholder="e.g. October 2026" required
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Location</label>
+                        <input type="text" name="location" required
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-widest text-primary">Image URL</label>
+                    <input type="url" name="image" placeholder="https://..." required
+                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-widest text-primary">Description</label>
+                    <textarea name="description" rows="3" required
+                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors"></textarea>
+                </div>
+
+                <div class="pt-4 flex gap-4">
+                    <button type="button" onclick="closeAddEventModal()"
+                        class="flex-1 px-6 py-3 border border-white/20 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-colors">
+                        Cancel
+                    </button>
+                    <!-- Added ID 'submitBtn' here -->
+                    <button type="submit" id="submitBtn"
+                        class="flex-1 px-6 py-3 bg-primary text-white rounded-full text-sm font-bold uppercase tracking-widest hover:bg-primary/80 transition-colors shadow-lg shadow-primary/20">
+                        Create Event
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Experience Detail Pages Container -->
+    <div id="experienceDetail" class="page-transition page-hidden"></div>
+
+    <!-- Linked scripts with defer to ensure execution order -->
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/admin.js"></script>
+    <script src="assets/js/member.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>
