@@ -266,10 +266,34 @@ async function deleteEvent(eventId) {
 }
 
 // Issue Credential (New Member)
-function openAddMemberModal() {
-    // This will eventually call the Netlify Function
+async function openAddMemberModal() {
     const email = prompt("Enter new member email:");
     if (!email) return;
 
-    alert(`Invite-only account creation for ${email} will be ready once deployed to Netlify.`);
+    const password = prompt("Enter temporary password (min 6 chars):");
+    if (!password || password.length < 6) {
+        alert("Password must be at least 6 characters.");
+        return;
+    }
+
+    try {
+        const response = await fetch('/.netlify/functions/add-member', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+            renderAdminMembers();
+            updateAdminStats();
+        } else {
+            throw new Error(result.error || 'Failed to create member');
+        }
+    } catch (err) {
+        console.error('Error creating member:', err);
+        alert(`Error: ${err.message}`);
+    }
 }
