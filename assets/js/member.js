@@ -1,3 +1,6 @@
+// Local state for registrations
+let REGISTERED_EVENT_IDS = [];
+
 // Show members dashboard
 function showMemberDashboard() {
     // Hide main site
@@ -16,19 +19,39 @@ function showMemberDashboard() {
 }
 
 // Initialize dashboard content
-function initializeDashboard() {
+async function initializeDashboard() {
     // Set greeting
-    const email = sessionStorage.getItem('userEmail') || 'member@mac.com';
-    document.getElementById('memberGreeting').textContent = 'Member';
+    const email = sessionStorage.getItem('userEmail') || 'Member';
+    document.getElementById('memberGreeting').textContent = email.split('@')[0];
 
-    // Render available events
+    // Fetch user registrations
+    await fetchUserRegistrations();
+
+    // Render components
     renderAvailableEvents();
-
-    // Render my events
     renderMyEvents();
-
-    // Update stats
     updateDashboardStats();
+}
+
+// Fetch user registrations from Supabase
+async function fetchUserRegistrations() {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const { data, error } = await supabase
+            .from('registrations')
+            .select('event_id, events(slug)')
+            .eq('user_id', session.user.id);
+
+        if (error) throw error;
+
+        // Extract slugs for easy lookup
+        REGISTERED_EVENT_IDS = data.map(r => r.events.slug);
+
+    } catch (err) {
+        console.error('Error fetching registrations:', err.message);
+    }
 }
 
 // Render available events in dashboard (Dynamic)
@@ -36,14 +59,10 @@ function renderAvailableEvents() {
     const grid = document.getElementById('availableEventsGrid');
     if (!grid) return;
 
-    const registeredEvents = JSON.parse(sessionStorage.getItem('registeredEvents') || '[]');
-    if (Object.keys(EXPERIENCE_DATA).length === 0) {
-        initializeData();
-    }
     const events = Object.values(EXPERIENCE_DATA);
 
     grid.innerHTML = events.map((event, index) => {
-        const isRegistered = registeredEvents.includes(event.slug);
+        const isRegistered = REGISTERED_EVENT_IDS.includes(event.slug);
         const offsetClass = index % 2 !== 0 ? 'md:mt-24' : '';
 
         return `
@@ -63,7 +82,7 @@ function renderAvailableEvents() {
                 <span class="text-primary dark:text-blush text-[10px] font-bold uppercase-tracking">${event.category}</span>
                 <h3 class="text-3xl font-serif mt-2 mb-3">${event.title}</h3>
                 <p class="opacity-70 text-sm font-normal leading-relaxed mb-6">
-                    ${event.date} • ${event.specs.duration}
+                    ${event.date} • ${event.specs.location}
                 </p>
                 ${isRegistered ?
                 '<button class="flex items-center gap-2 opacity-60 cursor-not-allowed"><span class="text-sm font-bold uppercase-tracking">Already Registered</span></button>' :
@@ -79,9 +98,8 @@ function renderAvailableEvents() {
 function renderMyEvents() {
     const grid = document.getElementById('myEventsGrid');
     const empty = document.getElementById('myEventsEmpty');
-    const registeredEvents = JSON.parse(sessionStorage.getItem('registeredEvents') || '[]');
 
-    if (registeredEvents.length === 0) {
+    if (REGISTERED_EVENT_IDS.length === 0) {
         grid.style.display = 'none';
         empty.style.display = 'block';
         return;
@@ -90,20 +108,14 @@ function renderMyEvents() {
     grid.style.display = 'grid';
     empty.style.display = 'none';
 
-    // In a real app, you would fetch details for registered IDs. 
-    // Here we use EXPERIENCE_DATA we already have.
-    if (Object.keys(EXPERIENCE_DATA).length === 0) {
-        initializeData();
-    }
-
-    grid.innerHTML = registeredEvents.map(eventId => {
-        const event = EXPERIENCE_DATA[eventId];
+    grid.innerHTML = REGISTERED_EVENT_IDS.map(slug => {
+        const event = EXPERIENCE_DATA[slug];
         if (!event) return '';
 
         return `
         <div class="flex flex-col gap-6 group">
             <div class="relative overflow-hidden rounded-xl aspect-[3/4] bg-charcoal hover-scale cursor-pointer"
-                onclick="showExperience('${eventId}')">
+                onclick="showExperience('${slug}')">
                 <div class="w-full h-full bg-center bg-no-repeat bg-cover transition-transform duration-700 group-hover:scale-105"
                     style='background-image: url("${event.image}");'>
                 </div>
@@ -114,10 +126,10 @@ function renderMyEvents() {
                 <span class="text-primary dark:text-blush text-[10px] font-bold uppercase-tracking">${event.category}</span>
                 <h3 class="text-3xl font-serif mt-2 mb-3">${event.title}</h3>
                 <p class="opacity-70 text-sm font-normal leading-relaxed mb-6">
-                    ${event.date}
+                    ${event.date} • ${event.specs.location}
                 </p>
                 <div class="flex gap-3">
-                    <button onclick="downloadCalendar('${eventId}', '${event.title}', '${event.date}')" class="flex-1 flex items-center justify-center gap-2 rounded-full h-12 px-6 border-2 border-primary text-primary text-sm font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
+                    <button onclick="downloadCalendarDetail('${slug}')" class="flex-1 flex items-center justify-center gap-2 rounded-full h-12 px-6 border-2 border-primary text-primary text-sm font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
                         <span class="material-symbols-outlined text-sm">calendar_add_on</span>
                         <span>Add to Calendar</span>
                     </button>
@@ -130,14 +142,13 @@ function renderMyEvents() {
 
 // Update dashboard stats
 function updateDashboardStats() {
-    const registeredEvents = JSON.parse(sessionStorage.getItem('registeredEvents') || '[]');
-    document.getElementById('registeredCount').textContent = registeredEvents.length;
+    document.getElementById('registeredCount').textContent = REGISTERED_EVENT_IDS.length;
 }
 
 // Open participation modal
-let pendingEventId = null;
-function openParticipationModal(eventId, eventName, eventDate) {
-    pendingEventId = eventId;
+let pendingEventSlug = null;
+function openParticipationModal(slug, eventName, eventDate) {
+    pendingEventSlug = slug;
     document.getElementById('confirmEventName').textContent = eventName;
     document.getElementById('confirmEventDate').textContent = eventDate;
     document.getElementById('participationModal').style.display = 'flex';
@@ -146,67 +157,47 @@ function openParticipationModal(eventId, eventName, eventDate) {
 // Close participation modal
 function closeParticipationModal() {
     document.getElementById('participationModal').style.display = 'none';
-    pendingEventId = null;
+    pendingEventSlug = null;
 }
 
 // Confirm participation
-function confirmParticipation() {
-    if (!pendingEventId) return;
+async function confirmParticipation() {
+    if (!pendingEventSlug) return;
 
-    const registeredEvents = JSON.parse(sessionStorage.getItem('registeredEvents') || '[]');
-    if (!registeredEvents.includes(pendingEventId)) {
-        registeredEvents.push(pendingEventId);
-        sessionStorage.setItem('registeredEvents', JSON.stringify(registeredEvents));
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('User not authenticated');
+
+        // First find the event UUID from the slug
+        const { data: event, error: eventError } = await supabase
+            .from('events')
+            .select('id')
+            .eq('slug', pendingEventSlug)
+            .single();
+
+        if (eventError) throw eventError;
+
+        const { error } = await supabase
+            .from('registrations')
+            .insert([
+                { user_id: session.user.id, event_id: event.id }
+            ]);
+
+        if (error) throw error;
+
+        closeParticipationModal();
+
+        // Refresh dashboard
+        await initializeDashboard();
+
+    } catch (err) {
+        console.error('Registration error:', err.message);
+        alert('Could not secure participation. Please try again.');
     }
-
-    closeParticipationModal();
-
-    // Refresh dashboard
-    renderAvailableEvents();
-    renderMyEvents();
-    updateDashboardStats();
 }
 
-// Download calendar file (.ics)
-function downloadCalendar(eventId, eventName, eventDate) {
-    const event = {
-        title: `MAC - ${eventName}`,
-        description: 'Exclusive MAC member experience',
-        location: 'Location TBD',
-        start: eventDate,
-        duration: 8 // hours
-    };
-
-    const icsContent = generateICS(event);
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `MAC-${eventName.replace(/\s+/g, '-')}.ics`;
-    link.click();
-}
-
-// Generate ICS file content
-function generateICS(event) {
-    // Simple mock date logic for demo purposes as real dates are string "October 2024"
-    const startDate = new Date();
-    const endDate = new Date(startDate.getTime() + event.duration * 60 * 60 * 1000);
-
-    const formatDate = (date) => {
-        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    };
-
-    return `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//MAC//Events//EN
-BEGIN:VEVENT
-UID:${Date.now()}@mac-experiences.com
-DTSTAMP:${formatDate(new Date())}
-DTSTART:${formatDate(startDate)}
-DTEND:${formatDate(endDate)}
-SUMMARY:${event.title}
-DESCRIPTION:${event.description}
-LOCATION:${event.location}
-STATUS:CONFIRMED
-END:VEVENT
-END:VCALENDAR`;
+// Simple redirect or placeholder for calendar (simplified for now)
+function downloadCalendarDetail(slug) {
+    const event = EXPERIENCE_DATA[slug];
+    alert(`Calendar invite for ${event.title} downloaded (Simulated).`);
 }

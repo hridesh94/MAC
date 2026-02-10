@@ -1,13 +1,25 @@
 // Check authentication status on page load
-function checkAuthStatus() {
-    const isAuthenticated = sessionStorage.getItem('macAuthenticated') === 'true';
-    const userRole = sessionStorage.getItem('userRole');
+async function checkAuthStatus() {
+    const { data: { session }, error } = await supabase.auth.getSession();
 
-    if (isAuthenticated) {
-        if (userRole === 'admin') {
-            showAdminDashboard();
-        } else {
-            showMemberDashboard();
+    if (session) {
+        // Fetch profile role
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+
+        if (profile) {
+            sessionStorage.setItem('macAuthenticated', 'true');
+            sessionStorage.setItem('userEmail', session.user.email);
+            sessionStorage.setItem('userRole', profile.role);
+
+            if (profile.role === 'admin') {
+                showAdminDashboard();
+            } else {
+                showMemberDashboard();
+            }
         }
     }
 }
@@ -33,18 +45,20 @@ function showLoginModal() {
             <form class="flex flex-col gap-6" onsubmit="handleLogin(event)">
                 <div class="flex flex-col gap-2">
                     <label class="small-caps text-blush text-xs font-semibold">Email Address</label>
-                    <input class="w-full rounded-lg text-white border border-blush/50 bg-black/30 focus:border-primary/50 focus:ring-1 focus:ring-primary/30 h-14 placeholder:text-blush/40 px-4 transition-all" placeholder="MEMBER@MACLUB.COM" type="email" required/>
+                    <input class="w-full rounded-lg text-white border border-blush/50 bg-black/30 focus:border-primary/50 focus:ring-1 focus:ring-primary/30 h-14 placeholder:text-blush/40 px-4 transition-all" placeholder="MEMBER@MACLUB.COM" type="email" name="email" required/>
                 </div>
                 
                 <div class="flex flex-col gap-2">
                     <label class="small-caps text-blush text-xs font-semibold">Security Key</label>
-                    <input class="w-full rounded-lg text-white border border-blush/50 bg-black/30 focus:border-primary/50 focus:ring-1 focus:ring-primary/30 h-14 placeholder:text-blush/40 px-4 transition-all" placeholder="••••••••••••" type="password" required/>
+                    <input class="w-full rounded-lg text-white border border-blush/50 bg-black/30 focus:border-primary/50 focus:ring-1 focus:ring-primary/30 h-14 placeholder:text-blush/40 px-4 transition-all" placeholder="••••••••••••" type="password" name="password" required/>
                 </div>
                 
-                <button class="w-full mt-4 flex cursor-pointer items-center justify-center rounded-lg h-14 bg-primary text-white text-base font-bold tracking-widest uppercase transition-all hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(212,17,50,0.3)]" type="submit">
+                <button id="authBtn" class="w-full mt-4 flex cursor-pointer items-center justify-center rounded-lg h-14 bg-primary text-white text-base font-bold tracking-widest uppercase transition-all hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(212,17,50,0.3)]" type="submit">
                     Authenticate
                 </button>
             </form>
+            
+            <div id="loginError" class="mt-4 text-red-500 text-xs text-center hidden"></div>
             
             <div class="mt-8 flex flex-col items-center gap-3">
                 <a class="text-blush text-xs font-medium uppercase tracking-widest hover:text-white transition-colors underline decoration-primary/30 underline-offset-4" href="#">Forgot Access Credentials?</a>
@@ -68,67 +82,63 @@ function closeLoginModal() {
 }
 
 // Handle login form submission
-function handleLogin(event) {
+async function handleLogin(event) {
     event.preventDefault();
+    const email = event.target.email.value;
+    const password = event.target.password.value;
+    const authBtn = document.getElementById('authBtn');
+    const errorEl = document.getElementById('loginError');
 
-    // Get form values
-    const email = event.target.querySelector('input[type="email"]').value;
-    const password = event.target.querySelector('input[type="password"]').value;
+    authBtn.textContent = 'Authenticating...';
+    authBtn.disabled = true;
+    errorEl.classList.add('hidden');
 
-    // Define credentials
-    const adminCredentials = {
-        email: 'admin@mac.com',
-        password: 'mac-admin-2026'
-    };
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
 
-    const memberCredentials = {
-        email: 'member@mac.com',
-        password: 'mac2026'
-    };
+        if (error) throw error;
 
-    // Check admin credentials first
-    if (email === adminCredentials.email && password === adminCredentials.password) {
-        // Set admin authentication state
+        // Fetch profile role after success
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .single();
+
+        if (profileError) throw profileError;
+
+        // Set session state
         sessionStorage.setItem('macAuthenticated', 'true');
         sessionStorage.setItem('userEmail', email);
-        sessionStorage.setItem('userRole', 'admin');
+        sessionStorage.setItem('userRole', profile.role);
 
-        // Close modal and show admin dashboard
         closeLoginModal();
-        showAdminDashboard();
-    }
-    // Check member credentials
-    else if (email === memberCredentials.email && password === memberCredentials.password) {
-        // Set member authentication state
-        sessionStorage.setItem('macAuthenticated', 'true');
-        sessionStorage.setItem('userEmail', email);
-        sessionStorage.setItem('userRole', 'member');
 
-        // Close modal and show member dashboard
-        closeLoginModal();
-        showMemberDashboard();
-    } else {
-        alert('Invalid credentials. Please contact administration for access.');
+        if (profile.role === 'admin') {
+            showAdminDashboard();
+        } else {
+            showMemberDashboard();
+        }
+
+    } catch (err) {
+        console.error('Login error:', err.message);
+        errorEl.textContent = err.message;
+        errorEl.classList.remove('hidden');
+        authBtn.textContent = 'Authenticate';
+        authBtn.disabled = false;
     }
 }
 
 // Handle logout
-function handleLogout() {
+async function handleLogout() {
+    await supabase.auth.signOut();
+
     // Clear session
-    sessionStorage.removeItem('macAuthenticated');
-    sessionStorage.removeItem('userEmail');
-    sessionStorage.removeItem('userRole');
-    sessionStorage.removeItem('registeredEvents');
+    sessionStorage.clear();
 
-    // Hide both dashboards
-    const memberDash = document.getElementById('membersDashboard');
-    const adminDash = document.getElementById('adminDashboard');
-    if (memberDash) memberDash.style.display = 'none';
-    if (adminDash) adminDash.style.display = 'none';
-
-    // Show main site
-    document.getElementById('mainSite').style.display = 'block';
-
-    // Scroll to top
-    window.scrollTo(0, 0);
+    // Reset UI
+    location.reload(); // Simplest way to reset the SPA state
 }
