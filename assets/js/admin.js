@@ -11,6 +11,63 @@ function showAdminDashboard() {
     initializeAdminData();
 }
 
+// Media Management State
+let selectedImageFile = null;
+
+// Handle image selection from file input
+async function handleImageSelection(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const placeholder = document.getElementById('uploadPlaceholder');
+    const preview = document.getElementById('uploadPreview');
+    const previewImg = document.getElementById('previewImg');
+
+    try {
+        // Optimize image before previewing to ensure performance
+        selectedImageFile = await optimizeImage(file);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImg.src = e.target.result;
+            placeholder.classList.add('hidden');
+            preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(selectedImageFile);
+    } catch (err) {
+        console.error('Image optimization failed:', err);
+        selectedImageFile = file;
+    }
+}
+
+// Remove selected image
+function removeSelectedImage() {
+    selectedImageFile = null;
+    document.getElementById('eventImageUpload').value = '';
+    document.getElementById('uploadPlaceholder').classList.remove('hidden');
+    document.getElementById('uploadPreview').classList.add('hidden');
+    document.getElementById('previewImg').src = '';
+}
+
+// Upload image to Supabase Storage
+async function uploadToSupabase(file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { data, error } = await supabase.storage
+        .from('experience-media')
+        .upload(filePath, file);
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabase.storage
+        .from('experience-media')
+        .getPublicUrl(filePath);
+
+    return publicUrl;
+}
+
 // Switch admin tabs
 function switchAdminTab(tabName) {
     // Hide all tabs
@@ -75,8 +132,8 @@ async function renderAdminEvents() {
                     <div class="text-xs opacity-60">${event.location}</div>
                 </td>
                 <td class="p-6">
-                    <div class="text-xl font-bold">${event.registrations ? event.registrations[0].count : 0}</div>
-                    <div class="text-xs opacity-60 uppercase tracking-widest">Participants</div>
+                    <div class="text-xl font-bold">${event.registrations[0].count}</div>
+                    <div class="text-xs opacity-60 uppercase tracking-widest">Active Members</div>
                 </td>
                 <td class="p-6 text-right">
                     <button onclick="openEditEventModal('${event.id}')" class="text-amber-500 hover:text-white transition-colors mr-4">Edit</button>
@@ -161,6 +218,9 @@ function openAddEventModal() {
     document.getElementById('eventId').value = '';
     document.getElementById('submitBtn').textContent = 'Create Event';
 
+    // Clear Image state
+    removeSelectedImage();
+
     modal.style.display = 'flex';
 }
 
@@ -189,6 +249,17 @@ async function openEditEventModal(eventId) {
         document.getElementById('modalTitle').textContent = 'Edit Event';
         document.getElementById('submitBtn').textContent = 'Update Event';
 
+        // Set Preview if image exists
+        removeSelectedImage();
+        if (event.image) {
+            const preview = document.getElementById('uploadPreview');
+            const previewImg = document.getElementById('previewImg');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            previewImg.src = event.image;
+            placeholder.classList.add('hidden');
+            preview.classList.remove('hidden');
+        }
+
         modal.style.display = 'flex';
     } catch (err) {
         console.error('Error opening edit modal:', err.message);
@@ -206,18 +277,34 @@ async function handleAdminAddEvent(e) {
     const form = e.target;
     const formData = new FormData(form);
     const eventId = document.getElementById('eventId').value;
-
-    const eventData = {
-        title: formData.get('title'),
-        category: formData.get('category'),
-        date: formData.get('date'),
-        location: formData.get('location'),
-        image: formData.get('image'),
-        description: formData.get('description'),
-        slug: formData.get('title').toLowerCase().replace(/\s+/g, '-')
-    };
+    const submitBtn = document.getElementById('submitBtn');
+    const originalBtnText = submitBtn.textContent;
 
     try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Uploading Image...';
+
+        let imageUrl = formData.get('image');
+
+        // 1. Upload new image if selected
+        if (selectedImageFile) {
+            imageUrl = await uploadToSupabase(selectedImageFile);
+        }
+
+        if (!imageUrl) throw new Error('Experience image is required');
+
+        const eventData = {
+            title: formData.get('title'),
+            category: formData.get('category'),
+            date: formData.get('date'),
+            location: formData.get('location'),
+            image: imageUrl,
+            description: formData.get('description'),
+            slug: formData.get('title').toLowerCase().replace(/\s+/g, '-')
+        };
+
+        submitBtn.textContent = 'Saving Event...';
+
         let error;
         if (eventId) {
             const { error: updateError } = await supabase
@@ -240,7 +327,10 @@ async function handleAdminAddEvent(e) {
         initializeData(); // Refresh global data
     } catch (err) {
         console.error('Error saving event:', err.message);
-        alert('Could not save event.');
+        alert(`Error: ${err.message}`);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
     }
 }
 

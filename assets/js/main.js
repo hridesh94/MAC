@@ -67,7 +67,7 @@ function showExperience(slug) {
         <section class="relative h-[85vh] w-full overflow-hidden">
             <div 
                 class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-[15s] hover:scale-105"
-                style="background-image: linear-gradient(rgba(24, 17, 18, 0.3) 0%, rgba(24, 17, 18, 0.9) 100%), url('${experience.image}')"
+                style="background-image: linear-gradient(rgba(24, 17, 18, 0.3) 0%, rgba(24, 17, 18, 0.9) 100%), url('${getCdnUrl(experience.image, 1600)}')"
             ></div>
             <div class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
                 <button 
@@ -160,7 +160,7 @@ function showExperience(slug) {
                     ${otherExperiences.map(e => `
                         <div onclick="showExperience('${e.slug}')" class="group flex flex-col gap-6 cursor-pointer">
                             <div class="relative aspect-video overflow-hidden rounded-xl bg-charcoal">
-                               <img src="${e.image}" alt="${e.title}" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                               <img src="${getCdnUrl(e.image, 600)}" alt="${e.title}" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                <div class="absolute inset-0 bg-charcoal/40 group-hover:bg-charcoal/20 transition-colors"></div>
                             </div>
                             <div>
@@ -243,7 +243,7 @@ function renderPublicEvents() {
         <div class="flex flex-col gap-6 group ${offsetClass}">
             <div class="relative overflow-hidden rounded-xl aspect-[3/4] bg-charcoal hover-scale cursor-pointer" onclick="showExperience('${event.slug}')">
                 <div class="w-full h-full bg-center bg-no-repeat bg-cover transition-transform duration-700 group-hover:scale-105"
-                    style="background-image: url('${event.image}');">
+                    style="background-image: url('${getCdnUrl(event.image)}');">
                 </div>
                 <div class="absolute inset-0 bg-gradient-to-t from-charcoal/80 to-transparent opacity-60"></div>
             </div>

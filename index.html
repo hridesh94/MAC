@@ -672,10 +672,38 @@
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label class="text-xs font-bold uppercase tracking-widest text-primary">Image URL</label>
-                    <input type="url" name="image" placeholder="https://..." required
-                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                <div class="space-y-4">
+                    <label class="text-xs font-bold uppercase tracking-widest text-primary">Experience Image</label>
+                    <div class="flex flex-col gap-4">
+                        <!-- File Upload UI -->
+                        <div class="relative group cursor-pointer border-2 border-dashed border-white/20 rounded-xl p-6 hover:border-primary transition-colors text-center"
+                            onclick="document.getElementById('eventImageUpload').click()">
+                            <input type="file" id="eventImageUpload" accept="image/*" class="hidden"
+                                onchange="handleImageSelection(event)">
+                            <div id="uploadPlaceholder" class="space-y-2">
+                                <span
+                                    class="material-symbols-outlined text-4xl opacity-40 group-hover:text-primary transition-colors">cloud_upload</span>
+                                <p class="text-xs opacity-60">Click to upload or drag and drop</p>
+                                <p class="text-[10px] opacity-40">Auto-optimized for performance</p>
+                            </div>
+                            <div id="uploadPreview"
+                                class="hidden relative aspect-video rounded-lg overflow-hidden border border-white/10">
+                                <img id="previewImg" src="" class="w-full h-full object-cover">
+                                <button type="button" onclick="event.stopPropagation(); removeSelectedImage()"
+                                    class="absolute top-2 right-2 bg-black/60 p-2 rounded-full hover:bg-red-500 transition-colors">
+                                    <span class="material-symbols-outlined text-xs">close</span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Manual URL (Optional) -->
+                        <div class="flex items-center gap-3">
+                            <div class="h-px flex-1 bg-white/10"></div>
+                            <span class="text-[10px] uppercase tracking-widest opacity-40">OR</span>
+                            <div class="h-px flex-1 bg-white/10"></div>
+                        </div>
+                        <input type="url" name="image" id="imageUrlInput" placeholder="Paste Image URL"
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
                 </div>
 
                 <div class="space-y-2">
@@ -707,6 +735,7 @@
     <script src="assets/js/supabase-client.js"></script>
 
     <!-- Linked scripts with defer to ensure execution order -->
+    <script src="assets/js/image-optimizer.js"></script>
     <script src="assets/js/data.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/admin.js"></script>

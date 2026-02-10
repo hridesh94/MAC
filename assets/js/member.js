@@ -41,8 +41,9 @@ async function fetchUserRegistrations() {
 
         const { data, error } = await supabase
             .from('registrations')
-            .select('event_id, events(slug)')
-            .eq('user_id', session.user.id);
+            .select('event_id, status, events(slug)')
+            .eq('user_id', session.user.id)
+            .neq('status', 'cancelled');
 
         if (error) throw error;
 
@@ -69,12 +70,12 @@ function renderAvailableEvents() {
         <div class="flex flex-col gap-6 group ${offsetClass}">
             <div class="relative overflow-hidden rounded-xl aspect-[3/4] bg-charcoal hover-scale cursor-pointer" onclick="showExperience('${event.slug}')">
                 <div class="w-full h-full bg-center bg-no-repeat bg-cover transition-transform duration-700 group-hover:scale-105"
-                    style="background-image: url('${event.image}');">
+                    style="background-image: url('${getCdnUrl(event.image)}');">
                 </div>
                 <div class="absolute inset-0 bg-gradient-to-t from-charcoal/80 to-transparent opacity-60"></div>
                 ${isRegistered ?
                 `<div class="absolute top-4 right-4 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
-                        Registered
+                        Confirmed
                     </div>` : ''
             }
             </div>
@@ -85,7 +86,7 @@ function renderAvailableEvents() {
                     ${event.date} • ${event.specs.location}
                 </p>
                 ${isRegistered ?
-                '<button class="flex items-center gap-2 opacity-60 cursor-not-allowed"><span class="text-sm font-bold uppercase-tracking">Already Registered</span></button>' :
+                '<button class="flex items-center gap-2 opacity-60 cursor-not-allowed"><span class="text-sm font-bold uppercase-tracking">Already Secured</span></button>' :
                 `<button onclick="event.stopPropagation(); openParticipationModal('${event.slug}', '${event.title}', '${event.date}')" class="flex items-center justify-center rounded-full h-12 px-8 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">Secure Participation</button>`
             }
             </div>
@@ -117,7 +118,7 @@ function renderMyEvents() {
             <div class="relative overflow-hidden rounded-xl aspect-[3/4] bg-charcoal hover-scale cursor-pointer"
                 onclick="showExperience('${slug}')">
                 <div class="w-full h-full bg-center bg-no-repeat bg-cover transition-transform duration-700 group-hover:scale-105"
-                    style='background-image: url("${event.image}");'>
+                    style='background-image: url("${getCdnUrl(event.image)}");'>
                 </div>
                 <div class="absolute inset-0 bg-gradient-to-t from-charcoal/80 to-transparent opacity-60"></div>
                 <div class="absolute top-4 right-4 bg-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Confirmed</div>
@@ -128,10 +129,13 @@ function renderMyEvents() {
                 <p class="opacity-70 text-sm font-normal leading-relaxed mb-6">
                     ${event.date} • ${event.specs.location}
                 </p>
-                <div class="flex gap-3">
-                    <button onclick="downloadCalendarDetail('${slug}')" class="flex-1 flex items-center justify-center gap-2 rounded-full h-12 px-6 border-2 border-primary text-primary text-sm font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
+                <div class="flex flex-col gap-3">
+                    <button onclick="downloadCalendarDetail('${slug}')" class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 border-2 border-primary text-primary text-sm font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
                         <span class="material-symbols-outlined text-sm">calendar_add_on</span>
                         <span>Add to Calendar</span>
+                    </button>
+                    <button onclick="cancelParticipation('${slug}')" class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 border border-white/20 text-white/40 text-[10px] font-bold uppercase tracking-widest hover:text-red-500 hover:border-red-500/50 transition-all">
+                        <span>Cancel Participation</span>
                     </button>
                 </div>
             </div>
@@ -179,9 +183,9 @@ async function confirmParticipation() {
 
         const { error } = await supabase
             .from('registrations')
-            .insert([
-                { user_id: session.user.id, event_id: event.id }
-            ]);
+            .upsert([
+                { user_id: session.user.id, event_id: event.id, status: 'confirmed' }
+            ], { onConflict: 'user_id, event_id' });
 
         if (error) throw error;
 
@@ -193,6 +197,32 @@ async function confirmParticipation() {
     } catch (err) {
         console.error('Registration error:', err.message);
         alert('Could not secure participation. Please try again.');
+    }
+}
+
+// Cancel participation
+async function cancelParticipation(slug) {
+    if (!confirm('Are you sure you want to cancel your participation?')) return;
+
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        // Find event ID
+        const { data: event } = await supabase.from('events').select('id').eq('slug', slug).single();
+
+        const { error } = await supabase
+            .from('registrations')
+            .update({ status: 'cancelled' })
+            .eq('user_id', session.user.id)
+            .eq('event_id', event.id);
+
+        if (error) throw error;
+
+        alert('Participation cancelled.');
+        await initializeDashboard();
+    } catch (err) {
+        console.error('Error cancelling:', err.message);
     }
 }
 
