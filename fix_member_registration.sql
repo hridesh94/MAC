@@ -60,4 +60,4 @@ END $$;
 -- 5. Grant necessary permissions to authenticated role
 GRANT SELECT ON public.events TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.registrations TO authenticated;
-GRANT USAGE ON SEQUENCE registrations_id_seq TO authenticated;
+-- Note: No sequence grant needed - registrations uses UUID primary key (gen_random_uuid())
