@@ -651,6 +651,43 @@
         </div>
     </div>
 
+    <!-- Issue Credential Modal (Admin) -->
+    <div id="issueCredentialModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
+        style="display: none;">
+        <div class="glass-card max-w-md w-full mx-4 p-8 rounded-2xl relative">
+            <button onclick="closeIssueCredentialModal()"
+                class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="material-symbols-outlined text-primary text-3xl">badge</span>
+                </div>
+
+                <h3 class="text-2xl font-serif italic mb-4">Issue Credential</h3>
+                <p class="opacity-80 mb-6 font-medium">Enter the email address for the new member</p>
+
+                <input type="email" id="newMemberEmail" placeholder="member@example.com"
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-center mb-6 focus:border-primary focus:outline-none transition-colors">
+
+                <p id="issueCredentialError" class="text-red-500 text-sm mb-6 hidden"></p>
+
+                <div class="flex gap-4">
+                    <button onclick="closeIssueCredentialModal()"
+                        class="flex-1 rounded-full h-12 px-6 border-2 border-white/20 text-white text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-all">
+                        Cancel
+                    </button>
+                    <button onclick="confirmIssueCredential()"
+                        class="flex-1 rounded-full h-12 px-6 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">
+                        Issue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Event Modal -->
     <div id="adminEventModal"
         class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
