@@ -503,3 +503,13 @@ async function confirmIssueCredential() {
         confirmBtn.textContent = originalText;
     }
 }
+
+// Approve Request -> Open Issue Credential Modal
+function approveRequest(email) {
+    openAddMemberModal(email);
+}
+
+// Manual Add Button -> Open Issue Credential Modal
+function handleManualAdd() {
+    openAddMemberModal();
+}
