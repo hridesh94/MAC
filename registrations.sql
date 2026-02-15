@@ -1,6 +1,12 @@
--- registrations.sql
+-- registrations.sql (Updated with DROP IF EXISTS)
 
--- 1. Create registrations table if it doesn't exist
+-- 1. Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can view own registrations" ON public.registrations;
+DROP POLICY IF EXISTS "Admins can view all registrations" ON public.registrations;
+DROP POLICY IF EXISTS "Members can secure event participation" ON public.registrations;
+DROP POLICY IF EXISTS "Users can update own registrations" ON public.registrations;
+
+-- 2. Create registrations table if it doesn't exist
 CREATE TABLE IF NOT EXISTS public.registrations (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMPTZ DEFAULT now(),
@@ -10,10 +16,10 @@ CREATE TABLE IF NOT EXISTS public.registrations (
     UNIQUE(user_id, event_id)
 );
 
--- 2. Enable RLS
+-- 3. Enable RLS
 ALTER TABLE public.registrations ENABLE ROW LEVEL SECURITY;
 
--- 3. Policies
+-- 4. Create Policies
 
 -- MEMBERS: Can view their own registrations
 CREATE POLICY "Users can view own registrations" 
@@ -39,5 +45,6 @@ CREATE POLICY "Users can update own registrations"
 ON public.registrations FOR UPDATE 
 USING ( auth.uid() = user_id );
 
--- 4. Real-time updates (Optional, for live dashboards)
-alter publication supabase_realtime add table public.registrations;
+-- 5. Real-time updates (Optional, for live dashboards)
+-- Uncomment if you want real-time subscriptions
+-- alter publication supabase_realtime add table public.registrations;
