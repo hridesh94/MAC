@@ -1,26 +1,50 @@
 // Check authentication status on page load
 async function checkAuthStatus() {
-    const { data: { session }, error } = await supabase.auth.getSession();
+    try {
+        // Safety check: ensure waitForSupabase is defined
+        if (typeof window.waitForSupabase !== 'function') {
+            // This might happen if script loads are out of order or failed
+            console.warn('waitForSupabase not defined yet, skipping initial auth check');
+            return;
+        }
 
-    if (session) {
-        // Fetch profile role
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
+        // Wait for Supabase to be ready
+        const supabase = await window.waitForSupabase();
 
-        if (profile) {
-            sessionStorage.setItem('macAuthenticated', 'true');
-            sessionStorage.setItem('userEmail', session.user.email);
-            sessionStorage.setItem('userRole', profile.role);
+        const { data: { session }, error } = await supabase.auth.getSession();
 
-            if (profile.role === 'admin') {
-                showAdminDashboard();
-            } else {
-                showMemberDashboard();
+        if (error) {
+            console.error('Error getting session:', error.message);
+            return;
+        }
+
+        if (session) {
+            // Fetch profile role
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+
+            if (profileError) {
+                console.error('Error fetching profile:', profileError.message);
+                return;
+            }
+
+            if (profile) {
+                sessionStorage.setItem('macAuthenticated', 'true');
+                sessionStorage.setItem('userEmail', session.user.email);
+                sessionStorage.setItem('userRole', profile.role);
+
+                if (profile.role === 'admin') {
+                    showAdminDashboard();
+                } else {
+                    showMemberDashboard();
+                }
             }
         }
+    } catch (error) {
+        console.error('Auth check failed:', error.message);
     }
 }
 
@@ -94,6 +118,18 @@ async function handleLogin(event) {
     errorEl.classList.add('hidden');
 
     try {
+        if (typeof window.waitForSupabase !== 'function') {
+            throw new Error('System initialization failed. Please refresh the page.');
+        }
+
+        // Wait for Supabase to be ready with timeout
+        const supabase = await Promise.race([
+            window.waitForSupabase(),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Authentication system timeout. Please refresh the page.')), 10000)
+            )
+        ]);
+
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password

@@ -127,6 +127,11 @@ header {
     transform: translateX(0);
 }
 
+/* Membership section should not force full viewport height */
+#membership {
+    min-height: auto !important;
+}
+
 @media (max-width: 768px) {
     .hero-title {
         font-size: 2.5rem !important;

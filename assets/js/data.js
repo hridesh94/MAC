@@ -4,6 +4,9 @@ let EXPERIENCE_DATA = {};
 // Initialize Data from Supabase
 async function initializeData() {
     try {
+        // Wait for Supabase to be ready
+        const supabase = await window.waitForSupabase();
+
         const { data: events, error } = await supabase
             .from('events')
             .select('*');
@@ -40,6 +43,7 @@ async function initializeData() {
 
     } catch (err) {
         console.error('Error fetching data from Supabase:', err.message);
+        EXPERIENCE_DATA = {};
     }
 }
 
