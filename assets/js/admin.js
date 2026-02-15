@@ -247,63 +247,104 @@ async function renderAdminMembers() {
     }
 }
 
-// Delete Member (Profile)
-// Revoke Access (Delete Member) - Trigger Modal
-let pendingRevokeUserId = null;
+// Generic Danger Modal State
+let pendingDangerAction = null;
 
-function deleteMember(userId) {
-    pendingRevokeUserId = userId;
-    const modal = document.getElementById('revokeAccessModal');
+function openDangerModal(title, message, buttonText, action) {
+    document.getElementById('dangerTitle').textContent = title;
+    document.getElementById('dangerMessage').textContent = message;
+
+    const btn = document.getElementById('dangerConfirmBtn');
+    btn.textContent = buttonText;
+
+    pendingDangerAction = action;
+
     // Reset error
-    const errorEl = document.getElementById('revokeAccessError');
+    const errorEl = document.getElementById('dangerError');
     if (errorEl) {
         errorEl.textContent = '';
         errorEl.classList.add('hidden');
     }
-    modal.style.display = 'flex';
+
+    document.getElementById('dangerModal').style.display = 'flex';
 }
 
-function closeRevokeAccessModal() {
-    document.getElementById('revokeAccessModal').style.display = 'none';
-    pendingRevokeUserId = null;
+function closeDangerModal() {
+    document.getElementById('dangerModal').style.display = 'none';
+    pendingDangerAction = null;
 }
 
-// Actual deletion logic attached to Modal "Revoke" button
-async function confirmRevokeAccess() {
-    if (!pendingRevokeUserId) return;
+async function confirmDangerAction() {
+    if (!pendingDangerAction) return;
 
-    const confirmBtn = document.querySelector('#revokeAccessModal button[onclick="confirmRevokeAccess()"]');
-    const originalText = confirmBtn.textContent;
-    const errorEl = document.getElementById('revokeAccessError');
+    const btn = document.getElementById('dangerConfirmBtn');
+    const originalText = btn.textContent;
+    const errorEl = document.getElementById('dangerError');
 
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Revoking...';
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+    errorEl.classList.add('hidden');
 
     try {
-        // Call Netlify Function to delete user from Auth (which cascades to Profile)
-        const response = await fetch('/.netlify/functions/delete-member', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: pendingRevokeUserId })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.error || 'Failed to revoke access');
-        }
-
-        closeRevokeAccessModal();
-        // Refresh data
+        await pendingDangerAction();
+        closeDangerModal();
+        // Refresh all data just in case
         initializeAdminData();
     } catch (err) {
-        console.error('Error deleting member:', err.message);
-        errorEl.textContent = 'Could not revoke access. ' + err.message;
+        console.error('Error in danger action:', err);
+        errorEl.textContent = err.message || 'Action failed.';
         errorEl.classList.remove('hidden');
     } finally {
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = originalText;
+        btn.disabled = false;
+        btn.textContent = originalText;
     }
+}
+
+// Delete Member (Revoke Access) - Uses Danger Modal
+function deleteMember(userId) {
+    openDangerModal(
+        'Revoke Access?',
+        "This will permanently delete the member's profile and data.",
+        'Revoke',
+        async () => {
+            const response = await fetch('/.netlify/functions/delete-member', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId })
+            });
+
+            if (!response.ok) {
+                const result = await response.json();
+                throw new Error(result.error || 'Failed to revoke access');
+            }
+        }
+    );
+}
+
+// Delete Event - Uses Danger Modal
+function deleteEvent(eventId) {
+    openDangerModal(
+        'Delete Event?',
+        "Are you sure you want to delete this event? This cannot be undone.",
+        'Delete',
+        async () => {
+            const { error } = await supabase.from('events').delete().eq('id', eventId);
+            if (error) throw error;
+        }
+    );
+}
+
+// Delete/Ignore Request - Uses Danger Modal
+function deleteRequest(requestId) {
+    openDangerModal(
+        'Ignore Request?',
+        "Are you sure you want to ignore this request?",
+        'Ignore',
+        async () => {
+            const { error } = await supabase.from('access_requests').delete().eq('id', requestId);
+            if (error) throw error;
+        }
+    );
 }
 
 // Open Add Event Modal
