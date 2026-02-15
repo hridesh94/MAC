@@ -428,15 +428,53 @@ async function deleteEvent(eventId) {
 }
 
 // Issue Credential (New Member)
-async function openAddMemberModal(prefillEmail = null) {
-    const email = prefillEmail || prompt("Enter new member email:");
-    if (!email) return;
+// Issue Credential (New Member)
+function openAddMemberModal(prefillEmail = '') {
+    openIssueCredentialModal(prefillEmail);
+}
 
-    const password = prompt("Enter temporary password (min 6 chars):");
-    if (!password || password.length < 6) {
-        alert("Password must be at least 6 characters.");
+// Issue Credential Modal Logic
+function openIssueCredentialModal(prefillEmail = '') {
+    const modal = document.getElementById('issueCredentialModal');
+    const emailInput = document.getElementById('newMemberEmail');
+    const passwordInput = document.getElementById('newMemberPassword');
+    const errorEl = document.getElementById('issueCredentialError');
+
+    // Reset fields
+    emailInput.value = prefillEmail || '';
+    passwordInput.value = '';
+    errorEl.textContent = '';
+    errorEl.classList.add('hidden');
+
+    modal.style.display = 'flex';
+}
+
+function closeIssueCredentialModal() {
+    document.getElementById('issueCredentialModal').style.display = 'none';
+}
+
+async function confirmIssueCredential() {
+    const email = document.getElementById('newMemberEmail').value;
+    const password = document.getElementById('newMemberPassword').value;
+    const errorEl = document.getElementById('issueCredentialError');
+    const confirmBtn = document.querySelector('#issueCredentialModal button[onclick="confirmIssueCredential()"]');
+    const originalText = confirmBtn.textContent;
+
+    if (!email || !password) {
+        errorEl.textContent = 'Email and password are required.';
+        errorEl.classList.remove('hidden');
         return;
     }
+
+    if (password.length < 6) {
+        errorEl.textContent = 'Password must be at least 6 characters.';
+        errorEl.classList.remove('hidden');
+        return;
+    }
+
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Issuing...';
+    errorEl.classList.add('hidden');
 
     try {
         const response = await fetch('/.netlify/functions/add-member', {
@@ -448,14 +486,20 @@ async function openAddMemberModal(prefillEmail = null) {
         const result = await response.json();
 
         if (response.ok) {
-            alert(result.message);
+            closeIssueCredentialModal();
+            // Optional: nice success feedback
             renderAdminMembers();
             updateAdminStats();
+            // alert('Credential issued successfully!'); // User dislikes alerts, maybe just close?
         } else {
             throw new Error(result.error || 'Failed to create member');
         }
     } catch (err) {
         console.error('Error creating member:', err);
-        alert(`Error: ${err.message}`);
+        errorEl.textContent = err.message || 'Failed to issue credential';
+        errorEl.classList.remove('hidden');
+    } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = originalText;
     }
 }

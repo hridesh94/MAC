@@ -445,7 +445,7 @@
                     <button onclick="openAddMemberModal()"
                         class="flex items-center gap-2 px-6 py-3 bg-amber-500 text-black rounded-full font-bold uppercase tracking-widest text-xs hover:shadow-lg hover:shadow-amber-500/20 transition-all">
                         <span class="material-symbols-outlined text-lg">person_add</span>
-                        Issue Credential- (Coming Soon)
+                        Issue Credential
                     </button>
                 </div>
                 <div class="glass-card rounded-xl overflow-hidden">
@@ -670,6 +670,9 @@
                 <p class="opacity-80 mb-6 font-medium">Enter the email address for the new member</p>
 
                 <input type="email" id="newMemberEmail" placeholder="member@example.com"
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-center mb-4 focus:border-primary focus:outline-none transition-colors">
+
+                <input type="password" id="newMemberPassword" placeholder="Temporary Password"
                     class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-center mb-6 focus:border-primary focus:outline-none transition-colors">
 
                 <p id="issueCredentialError" class="text-red-500 text-sm mb-6 hidden"></p>
