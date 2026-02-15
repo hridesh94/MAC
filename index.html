@@ -692,12 +692,11 @@
         </div>
     </div>
 
-    <!-- Revoke Access Modal (Admin) -->
-    <div id="revokeAccessModal"
-        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
+    <!-- Generic Danger Modal (Admin) -->
+    <div id="dangerModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
         style="display: none;">
         <div class="glass-card max-w-md w-full mx-4 p-8 rounded-2xl relative">
-            <button onclick="closeRevokeAccessModal()"
+            <button onclick="closeDangerModal()"
                 class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
                 <span class="material-symbols-outlined">close</span>
             </button>
@@ -707,19 +706,19 @@
                     <span class="material-symbols-outlined text-red-500 text-3xl">warning</span>
                 </div>
 
-                <h3 class="text-2xl font-serif italic mb-4">Revoke Access?</h3>
-                <p class="opacity-80 mb-6 font-medium">This will permanently delete the member's profile and data.</p>
+                <h3 id="dangerTitle" class="text-2xl font-serif italic mb-4">Are you sure?</h3>
+                <p id="dangerMessage" class="opacity-80 mb-6 font-medium">This action cannot be undone.</p>
 
-                <p id="revokeAccessError" class="text-red-500 text-sm mb-6 hidden"></p>
+                <p id="dangerError" class="text-red-500 text-sm mb-6 hidden"></p>
 
                 <div class="flex gap-4">
-                    <button onclick="closeRevokeAccessModal()"
+                    <button onclick="closeDangerModal()"
                         class="flex-1 rounded-full h-12 px-6 border-2 border-white/20 text-white text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-all">
                         Cancel
                     </button>
-                    <button onclick="confirmRevokeAccess()"
+                    <button id="dangerConfirmBtn" onclick="confirmDangerAction()"
                         class="flex-1 rounded-full h-12 px-6 bg-red-600 text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-red-600/20 transition-all hover-scale">
-                        Revoke
+                        Confirm
                     </button>
                 </div>
             </div>
@@ -843,6 +842,7 @@
                         class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors"></textarea>
                 </div>
 
+                <p id="eventModalError" class="text-red-500 text-sm hidden"></p>
                 <div class="pt-4 flex gap-4">
                     <button type="button" onclick="closeAddEventModal()"
                         class="flex-1 px-6 py-3 border border-white/20 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-colors">

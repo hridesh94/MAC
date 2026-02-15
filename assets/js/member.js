@@ -269,7 +269,7 @@ async function confirmParticipation() {
             errorEl.textContent = err.message || 'An unexpected error occurred.';
             errorEl.classList.remove('hidden');
         } else {
-            alert(err.message); // Fallback if element missing
+            console.error(err.message); // Fallback if element missing
         }
     } finally {
         confirmBtn.disabled = false;
@@ -288,5 +288,5 @@ function triggerCancelParticipation(slug, title, date) {
 // Simple redirect or placeholder for calendar (simplified for now)
 function downloadCalendarDetail(slug) {
     const event = EXPERIENCE_DATA[slug];
-    alert(`Calendar invite for ${event.title} downloaded (Simulated).`);
+    console.log(`Calendar invite for ${event.title} downloaded (Simulated).`);
 }

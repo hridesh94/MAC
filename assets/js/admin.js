@@ -140,16 +140,7 @@ async function renderAccessRequests() {
 }
 
 // Delete/Ignore Request
-async function deleteRequest(id) {
-    if (!confirm('Ignore this request?')) return;
-    try {
-        const { error } = await supabase.from('access_requests').delete().eq('id', id);
-        if (error) throw error;
-        renderAccessRequests();
-    } catch (err) {
-        console.error('Error deleting request:', err);
-    }
-}
+
 
 
 
@@ -428,10 +419,12 @@ async function handleAdminAddEvent(e) {
     const eventId = document.getElementById('eventId').value;
     const submitBtn = document.getElementById('submitBtn');
     const originalBtnText = submitBtn.textContent;
+    const errorEl = document.getElementById('eventModalError');
 
     try {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Uploading Image...';
+        if (errorEl) errorEl.classList.add('hidden');
 
         let imageUrl = formData.get('image');
 
@@ -473,13 +466,16 @@ async function handleAdminAddEvent(e) {
 
         if (error) throw error;
 
-        alert(`Event ${eventId ? 'updated' : 'created'} successfully!`);
+        // Success - Close Modal and Refresh
         closeAddEventModal();
         initializeAdminData();
         initializeData(); // Refresh global data
     } catch (err) {
         console.error('Error saving event:', err.message);
-        alert(`Error: ${err.message}`);
+        if (errorEl) {
+            errorEl.textContent = `Error: ${err.message}`;
+            errorEl.classList.remove('hidden');
+        }
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
@@ -487,25 +483,7 @@ async function handleAdminAddEvent(e) {
 }
 
 // Delete Event
-async function deleteEvent(eventId) {
-    if (!confirm('Are you sure you want to delete this event?')) return;
 
-    try {
-        const { error } = await supabase
-            .from('events')
-            .delete()
-            .eq('id', eventId);
-
-        if (error) throw error;
-
-        alert('Event deleted successfully.');
-        initializeAdminData();
-        initializeData();
-    } catch (err) {
-        console.error('Error deleting event:', err.message);
-        alert('Could not delete event.');
-    }
-}
 
 // Issue Credential (New Member)
 // Issue Credential (New Member)

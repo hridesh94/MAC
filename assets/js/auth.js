@@ -164,8 +164,17 @@ async function handleAccessRequest(event) {
             throw error;
         }
 
-        alert('Request sent! We will contact you if your application is approved.');
-        closeRequestModal();
+        btn.textContent = 'Request Sent!';
+        btn.classList.add('bg-green-600', 'text-white');
+
+        setTimeout(() => {
+            closeRequestModal();
+            // Reset button state
+            btn.textContent = 'Send Request';
+            btn.classList.remove('bg-green-600', 'text-white');
+            btn.disabled = false;
+        }, 1500);
+
     } catch (err) {
         console.error('Request error:', err.message);
         errorEl.textContent = err.message;
