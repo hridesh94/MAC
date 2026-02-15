@@ -1,0 +1,12 @@
+{
+    "name": "mac-website",
+    "version": "1.0.0",
+    "description": "MAC - The Limitless Club",
+    "private": true,
+    "dependencies": {
+        "@supabase/supabase-js": "^2.39.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
