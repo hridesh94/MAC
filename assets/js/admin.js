@@ -305,7 +305,13 @@ function deleteMember(userId) {
             });
 
             if (!response.ok) {
-                const result = await response.json();
+                let result;
+                const text = await response.text();
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    throw new Error(`Server returned ${response.status} ${response.statusText}. Ensure Netlify Functions are running.`);
+                }
                 throw new Error(result.error || 'Failed to revoke access');
             }
         }
@@ -541,14 +547,21 @@ async function confirmIssueCredential() {
             body: JSON.stringify({ email, password })
         });
 
-        const result = await response.json();
+        let result;
+        const text = await response.text();
+
+        try {
+            result = JSON.parse(text);
+        } catch (e) {
+            console.error('Invalid JSON response:', text);
+            throw new Error(`Server returned ${response.status} ${response.statusText}. Ensure Netlify Functions are running.`);
+        }
 
         if (response.ok) {
             closeIssueCredentialModal();
             // Optional: nice success feedback
             renderAdminMembers();
             updateAdminStats();
-            // alert('Credential issued successfully!'); // User dislikes alerts, maybe just close?
         } else {
             throw new Error(result.error || 'Failed to create member');
         }
