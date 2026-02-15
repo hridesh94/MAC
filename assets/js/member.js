@@ -134,7 +134,7 @@ function renderMyEvents() {
                         <span class="material-symbols-outlined text-sm">calendar_add_on</span>
                         <span>Add to Calendar</span>
                     </button>
-                    <button onclick="cancelParticipation('${slug}')" class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 border border-white/20 text-white/40 text-[10px] font-bold uppercase tracking-widest hover:text-red-500 hover:border-red-500/50 transition-all">
+                    <button onclick="triggerCancelParticipation('${event.slug}', '${event.title}', '${event.date}')" class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 border border-white/20 text-white/40 text-[10px] font-bold uppercase tracking-widest hover:text-red-500 hover:border-red-500/50 transition-all">
                         <span>Cancel Participation</span>
                     </button>
                 </div>
@@ -151,10 +151,49 @@ function updateDashboardStats() {
 
 // Open participation modal
 let pendingEventSlug = null;
-function openParticipationModal(slug, eventName, eventDate) {
+let pendingAction = 'join'; // 'join' or 'cancel'
+
+function openParticipationModal(slug, eventName, eventDate, action = 'join') {
     pendingEventSlug = slug;
+    pendingAction = action;
+
+    // Reset error
+    const errorEl = document.getElementById('participationError');
+    if (errorEl) {
+        errorEl.textContent = '';
+        errorEl.classList.add('hidden');
+    }
+
+    // Update Modal Content based on Action
+    const modalTitle = document.getElementById('participationModal').querySelector('h3');
+    const confirmBtn = document.getElementById('participationModal').querySelector('button[onclick="confirmParticipation()"]');
+    const iconSpan = document.getElementById('participationModal').querySelector('.material-symbols-outlined');
+
     document.getElementById('confirmEventName').textContent = eventName;
     document.getElementById('confirmEventDate').textContent = eventDate;
+
+    if (action === 'cancel') {
+        modalTitle.textContent = 'Cancel Participation?';
+        confirmBtn.textContent = 'Confirm Cancellation';
+        confirmBtn.classList.replace('bg-primary', 'bg-red-600');
+        confirmBtn.classList.replace('hover:shadow-primary/20', 'hover:shadow-red-600/20');
+        if (iconSpan) {
+            iconSpan.textContent = 'warning';
+            iconSpan.className = 'material-symbols-outlined text-red-500 text-3xl';
+            iconSpan.parentElement.className = 'w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6';
+        }
+    } else {
+        modalTitle.textContent = 'Confirm Participation';
+        confirmBtn.textContent = 'Confirm';
+        confirmBtn.classList.replace('bg-red-600', 'bg-primary');
+        confirmBtn.classList.replace('hover:shadow-red-600/20', 'hover:shadow-primary/20');
+        if (iconSpan) {
+            iconSpan.textContent = 'check_circle';
+            iconSpan.className = 'material-symbols-outlined text-primary text-3xl';
+            iconSpan.parentElement.className = 'w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6';
+        }
+    }
+
     document.getElementById('participationModal').style.display = 'flex';
 }
 
@@ -162,11 +201,23 @@ function openParticipationModal(slug, eventName, eventDate) {
 function closeParticipationModal() {
     document.getElementById('participationModal').style.display = 'none';
     pendingEventSlug = null;
+    pendingAction = 'join';
 }
 
-// Confirm participation
+// Confirm participation (or cancellation)
 async function confirmParticipation() {
     if (!pendingEventSlug) return;
+
+    const errorEl = document.getElementById('participationError');
+    if (errorEl) {
+        errorEl.classList.add('hidden');
+        errorEl.textContent = '';
+    }
+
+    const confirmBtn = document.getElementById('participationModal').querySelector('button[onclick="confirmParticipation()"]');
+    const originalText = confirmBtn.textContent;
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Processing...';
 
     try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -179,15 +230,33 @@ async function confirmParticipation() {
             .eq('slug', pendingEventSlug)
             .single();
 
-        if (eventError) throw eventError;
+        if (eventError) throw new Error('Event not found or access denied. Please contact support.');
 
-        const { error } = await supabase
-            .from('registrations')
-            .upsert([
-                { user_id: session.user.id, event_id: event.id, status: 'confirmed' }
-            ], { onConflict: 'user_id, event_id' });
+        if (pendingAction === 'cancel') {
+            // Handle Cancellation
+            const { error } = await supabase
+                .from('registrations')
+                .delete()
+                .eq('user_id', session.user.id)
+                .eq('event_id', event.id);
 
-        if (error) throw error;
+            if (error) throw error;
+        } else {
+            // Handle Registration
+            const { error } = await supabase
+                .from('registrations')
+                .upsert([
+                    { user_id: session.user.id, event_id: event.id, status: 'confirmed' }
+                ], { onConflict: 'user_id, event_id' });
+
+            if (error) {
+                console.error('Supabase Upsert Error:', error);
+                // Improve error message for common RLS issues
+                if (error.code === '42501') throw new Error('Permission denied. You may not be allowed to register.');
+                if (error.code === '23505') throw new Error('You are already registered for this event.');
+                throw error;
+            }
+        }
 
         closeParticipationModal();
 
@@ -195,36 +264,26 @@ async function confirmParticipation() {
         await initializeDashboard();
 
     } catch (err) {
-        console.error('Registration error:', err.message);
-        alert('Could not secure participation. Please try again.');
+        console.error('Registration error details:', err);
+        if (errorEl) {
+            errorEl.textContent = err.message || 'An unexpected error occurred.';
+            errorEl.classList.remove('hidden');
+        } else {
+            alert(err.message); // Fallback if element missing
+        }
+    } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = originalText;
     }
 }
 
-// Cancel participation
-async function cancelParticipation(slug) {
-    if (!confirm('Are you sure you want to cancel your participation?')) return;
-
-    try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-
-        // Find event ID
-        const { data: event } = await supabase.from('events').select('id').eq('slug', slug).single();
-
-        const { error } = await supabase
-            .from('registrations')
-            .update({ status: 'cancelled' })
-            .eq('user_id', session.user.id)
-            .eq('event_id', event.id);
-
-        if (error) throw error;
-
-        alert('Participation cancelled.');
-        await initializeDashboard();
-    } catch (err) {
-        console.error('Error cancelling:', err.message);
-    }
+// Cancel participation trigger
+function triggerCancelParticipation(slug, title, date) {
+    openParticipationModal(slug, title, date, 'cancel');
 }
+
+
+
 
 // Simple redirect or placeholder for calendar (simplified for now)
 function downloadCalendarDetail(slug) {
