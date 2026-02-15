@@ -236,7 +236,7 @@ async function renderAdminMembers() {
                 </td>
                 <td class="p-6 text-right">
                     ${member.role !== 'admin' ?
-                `<button onclick="deleteMember('${member.id}', '${member.email}')" class="text-red-500 hover:text-white transition-colors">Revoke Access</button>` :
+                `<button onclick="deleteMember('${member.id}')" class="text-red-500 hover:text-white transition-colors">Revoke Access</button>` :
                 '<span class="text-xs text-white/30 italic">Administrator</span>'
             }
                 </td>
@@ -247,53 +247,23 @@ async function renderAdminMembers() {
     }
 }
 
-// Revoke Access Logic
-let pendingRevokeUserId = null;
-
-function deleteMember(userId, email) {
-    if (userId) {
-        pendingRevokeUserId = userId;
-        document.getElementById('revokeMemberEmail').textContent = email || 'this member';
-        document.getElementById('revokeAccessModal').style.display = 'flex';
-        document.getElementById('revokeAccessError').classList.add('hidden');
-    }
-}
-
-function closeRevokeAccessModal() {
-    document.getElementById('revokeAccessModal').style.display = 'none';
-    pendingRevokeUserId = null;
-}
-
-async function confirmRevokeAccess() {
-    if (!pendingRevokeUserId) return;
-
-    const confirmBtn = document.querySelector('#revokeAccessModal button[onclick="confirmRevokeAccess()"]');
-    const originalText = confirmBtn.textContent;
-    const errorEl = document.getElementById('revokeAccessError');
-
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Revoking...';
-    errorEl.classList.add('hidden');
+// Delete Member (Profile)
+async function deleteMember(userId) {
+    if (!confirm('Are you sure you want to revoke access? This will delete their profile.')) return;
 
     try {
         const { error } = await supabase
             .from('profiles')
             .delete()
-            .eq('id', pendingRevokeUserId);
+            .eq('id', userId);
 
         if (error) throw error;
 
-        closeRevokeAccessModal();
-        // Remove from UI immediately to feel responsive
-        renderAdminMembers();
-        updateAdminStats();
+        alert('Access revoked successfully.');
+        initializeAdminData();
     } catch (err) {
-        console.error('Error revoking access:', err.message);
-        errorEl.textContent = 'Could not revoke access: ' + err.message;
-        errorEl.classList.remove('hidden');
-    } finally {
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = originalText;
+        console.error('Error deleting member:', err.message);
+        alert('Could not revoke access.');
     }
 }
 
@@ -511,23 +481,7 @@ async function confirmIssueCredential() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
-        }
-
-// Add Enter key support for Issue Credential Inputs
-document.addEventListener('DOMContentLoaded', () => {
-            const inputs = ['newMemberEmail', 'newMemberPassword'];
-            inputs.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            confirmIssueCredential();
-                        }
-                    });
-                }
-            });
-        }););
+        });
 
         const result = await response.json();
 
