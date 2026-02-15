@@ -284,27 +284,36 @@ function openAddEventModal() {
 }
 
 // Open Edit Event Modal
-async function openEditEventModal(eventId) {
+async function openEditEventModal(identifier) {
     try {
-        const { data: event, error } = await supabase
-            .from('events')
-            .select('*')
-            .eq('id', eventId)
-            .single();
+        let query = supabase.from('events').select('*');
+
+        // Simple heuristic: UUIDs are 36 chars and contain dashes
+        // If it looks like a UUID, search by ID, otherwise by slug
+        if (identifier.length === 36 && identifier.includes('-')) {
+            query = query.eq('id', identifier);
+        } else {
+            query = query.eq('slug', identifier);
+        }
+
+        const { data: event, error } = await query.single();
 
         if (error) throw error;
 
         const modal = document.getElementById('adminEventModal');
         const form = modal.querySelector('form');
 
-        form.querySelector('[name="title"]').value = event.title;
-        form.querySelector('[name="category"]').value = event.category;
-        form.querySelector('[name="date"]').value = event.date;
-        form.querySelector('[name="location"]').value = event.location;
-        form.querySelector('[name="image"]').value = event.image;
-        form.querySelector('[name="description"]').value = event.description;
+        form.querySelector('[name="title"]').value = event.title || '';
+        form.querySelector('[name="category"]').value = event.category || 'Sand';
+        form.querySelector('[name="date"]').value = event.date || '';
+        form.querySelector('[name="location"]').value = event.location || '';
+        form.querySelector('[name="duration"]').value = event.duration || '';
+        form.querySelector('[name="equipment"]').value = event.equipment || 'Standard';
+        form.querySelector('[name="difficulty"]').value = event.difficulty || 'All Levels';
+        form.querySelector('[name="image"]').value = event.image || ''; // Ensure manual URL input is populated
+        form.querySelector('[name="description"]').value = event.description || '';
 
-        document.getElementById('eventId').value = eventId;
+        document.getElementById('eventId').value = event.id; // Always store ID for updates
         document.getElementById('modalTitle').textContent = 'Edit Event';
         document.getElementById('submitBtn').textContent = 'Update Event';
 
@@ -322,6 +331,7 @@ async function openEditEventModal(eventId) {
         modal.style.display = 'flex';
     } catch (err) {
         console.error('Error opening edit modal:', err.message);
+        alert('Error loading event details');
     }
 }
 
@@ -357,6 +367,9 @@ async function handleAdminAddEvent(e) {
             category: formData.get('category'),
             date: formData.get('date'),
             location: formData.get('location'),
+            duration: formData.get('duration'),
+            equipment: formData.get('equipment'),
+            difficulty: formData.get('difficulty'),
             image: imageUrl,
             description: formData.get('description'),
             slug: formData.get('title').toLowerCase().replace(/\s+/g, '-')

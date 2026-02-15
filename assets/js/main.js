@@ -100,22 +100,34 @@ function showExperience(slug) {
                     </p>
 
                     <div class="pt-20 border-t border-white/5">
-                        ${previousViewId === 'membersDashboard' ?
-            (() => {
+                        ${(() => {
+            const userRole = sessionStorage.getItem('userRole');
+            const isAdmin = userRole === 'admin';
+
+            if (isAdmin) {
+                // Admin view - show Edit button
+                return `<button onclick="openEditEventModal('${experience.slug}')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-amber-600 text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-amber-600/30">
+                                        <span class="material-symbols-outlined mr-2">edit</span>
+                                        Edit Event Details
+                                    </button>`;
+            } else if (previousViewId === 'membersDashboard') {
+                // Member view - show participation button
                 const registeredEvents = JSON.parse(sessionStorage.getItem('registeredEvents') || '[]');
                 if (registeredEvents.includes(experience.slug)) {
                     return `<button class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-white/10 border border-white/20 text-white/50 text-sm font-black uppercase tracking-widest cursor-not-allowed">
-                                        Already Registered
-                                    </button>`;
+                                            Already Registered
+                                        </button>`;
                 }
                 return `<button onclick="openParticipationModal('${experience.slug}', '${experience.title}', '${experience.date}')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
-                                    Secure Participation
-                                </button>`;
-            })() :
-            `<button onclick="navigateTo('login')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
-                                Secure Participation
-                            </button>`
-        }
+                                        Secure Participation
+                                    </button>`;
+            } else {
+                // Public view - prompt to login
+                return `<button onclick="navigateTo('login')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
+                                        Secure Participation
+                                    </button>`;
+            }
+        })()}
                     </div>
                 </div>
 
