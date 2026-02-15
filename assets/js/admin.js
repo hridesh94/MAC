@@ -93,7 +93,66 @@ async function initializeAdminData() {
     await updateAdminStats();
     await renderAdminEvents();
     await renderAdminMembers();
+    await renderAccessRequests();
 }
+
+// ... (existing code)
+
+// Render Access Requests
+async function renderAccessRequests() {
+    try {
+        const { data: requests, error } = await supabase
+            .from('access_requests')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const tbody = document.getElementById('adminRequestsTable');
+
+        if (requests.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-white/50">No pending requests</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = requests.map(req => `
+            <tr class="hover:bg-white/5 transition-colors">
+                <td class="p-6">
+                    <div class="font-bold">${req.email}</div>
+                </td>
+                <td class="p-6">
+                    <div class="text-xs opacity-60">${new Date(req.created_at).toLocaleDateString()}</div>
+                </td>
+                <td class="p-6">
+                    <span class="px-3 py-1 bg-amber-500/10 text-amber-500 rounded-full text-xs font-bold uppercase tracking-widest border border-amber-500/20">
+                        ${req.status.toUpperCase()}
+                    </span>
+                </td>
+                <td class="p-6 text-right">
+                    <button onclick="openAddMemberModal('${req.email}')" class="text-green-500 hover:text-white transition-colors mr-4">Approve</button>
+                    <button onclick="deleteRequest('${req.id}')" class="text-red-500 hover:text-white transition-colors">Ignore</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        console.error('Error rendering requests:', err.message);
+    }
+}
+
+// Delete/Ignore Request
+async function deleteRequest(id) {
+    if (!confirm('Ignore this request?')) return;
+    try {
+        const { error } = await supabase.from('access_requests').delete().eq('id', id);
+        if (error) throw error;
+        renderAccessRequests();
+    } catch (err) {
+        console.error('Error deleting request:', err);
+    }
+}
+
+
+
 
 // Update admin stats
 async function updateAdminStats() {
@@ -356,8 +415,8 @@ async function deleteEvent(eventId) {
 }
 
 // Issue Credential (New Member)
-async function openAddMemberModal() {
-    const email = prompt("Enter new member email:");
+async function openAddMemberModal(prefillEmail = null) {
+    const email = prefillEmail || prompt("Enter new member email:");
     if (!email) return;
 
     const password = prompt("Enter temporary password (min 6 chars):");

@@ -364,6 +364,9 @@
                         <button onclick="switchAdminTab('registrations')"
                             class="admin-nav-link text-sm uppercase tracking-widest hover:text-amber-500 transition-colors opacity-60"
                             id="nav-registrations">Status</button>
+                        <button onclick="switchAdminTab('requests')"
+                            class="admin-nav-link text-sm uppercase tracking-widest hover:text-amber-500 transition-colors opacity-60"
+                            id="nav-requests">Requests</button>
                         <button onclick="handleLogout()"
                             class="px-6 py-2 border border-amber-500/50 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all">
                             Logout
@@ -472,6 +475,28 @@
                     <h3 class="text-xl font-bold mb-2">Analytics Dashboard</h3>
                     <p class="text-white/60 max-w-md mx-auto">Registration trends and export functionality coming in
                         next update.</p>
+                </div>
+            </div>
+
+            <!-- Access Requests Tab -->
+            <div id="admin-tab-requests" class="admin-tab-content hidden">
+                <h2 class="text-2xl font-serif italic mb-8">Access Requests</h2>
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-white/5 text-xs uppercase tracking-widest">
+                                <tr>
+                                    <th class="p-6">Email</th>
+                                    <th class="p-6">Date</th>
+                                    <th class="p-6">Status</th>
+                                    <th class="p-6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5" id="adminRequestsTable">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

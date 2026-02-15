@@ -84,8 +84,10 @@ function showLoginModal() {
             
             <div id="loginError" class="mt-4 text-red-500 text-xs text-center hidden"></div>
             
-            <div class="mt-8 flex flex-col items-center gap-3">
-                <a class="text-blush text-xs font-medium uppercase tracking-widest hover:text-white transition-colors underline decoration-primary/30 underline-offset-4" href="#">Forgot Access Credentials?</a>
+    <div class="mt-8 flex flex-col items-center gap-3">
+                <button onclick="showRequestAccessModal()" class="text-blush text-xs font-medium uppercase tracking-widest hover:text-white transition-colors underline decoration-primary/30 underline-offset-4">
+                    Request an Invitation
+                </button>
                 <div class="h-[1px] w-12 bg-blush/50 my-2"></div>
                 <p class="text-blush/60 text-[10px] uppercase tracking-[0.2em] text-center">Protected by military-grade encryption</p>
             </div>
@@ -94,6 +96,83 @@ function showLoginModal() {
     `;
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
+}
+
+// Show Request Access Modal
+function showRequestAccessModal() {
+    closeLoginModal();
+    const modal = document.createElement('div');
+    modal.id = 'requestModal';
+    modal.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md';
+    modal.innerHTML = `
+    <div class="relative w-full max-w-md mx-4">
+        <div class="glass-panel rounded-xl p-10 flex flex-col shadow-2xl relative">
+            <button onclick="closeRequestModal()" class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">close</span>
+            </button>
+            
+            <div class="flex justify-center mb-6">
+                <span class="material-symbols-outlined text-amber-500 text-4xl font-light">mail</span>
+            </div>
+            
+            <h1 class="text-white font-serif text-3xl font-bold leading-tight text-center pb-2">Request Access</h1>
+            <p class="text-blush/60 text-center text-xs mb-8 uppercase tracking-widest">Membership is by Invitation Only</p>
+            
+            <form class="flex flex-col gap-6" onsubmit="handleAccessRequest(event)">
+                <div class="flex flex-col gap-2">
+                    <label class="small-caps text-blush text-xs font-semibold">Email Address</label>
+                    <input class="w-full rounded-lg text-white border border-blush/50 bg-black/30 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 h-14 placeholder:text-blush/40 px-4 transition-all" placeholder="YOU@EXAMPLE.COM" type="email" name="email" required/>
+                </div>
+                
+                <button id="reqBtn" class="w-full mt-4 flex cursor-pointer items-center justify-center rounded-lg h-14 bg-amber-600 text-white text-base font-bold tracking-widest uppercase transition-all hover:bg-amber-500 hover:shadow-[0_0_20px_rgba(217,119,6,0.3)]" type="submit">
+                    Send Request
+                </button>
+            </form>
+            
+            <div id="reqError" class="mt-4 text-red-500 text-xs text-center hidden"></div>
+        </div>
+    </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function closeRequestModal() {
+    const modal = document.getElementById('requestModal');
+    if (modal) modal.remove();
+}
+
+// Handle Access Request
+async function handleAccessRequest(event) {
+    event.preventDefault();
+    const email = event.target.email.value;
+    const btn = document.getElementById('reqBtn');
+    const errorEl = document.getElementById('reqError');
+
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    errorEl.classList.add('hidden');
+
+    try {
+        const supabase = await window.waitForSupabase();
+
+        const { error } = await supabase
+            .from('access_requests')
+            .insert([{ email }]);
+
+        if (error) {
+            if (error.code === '23505') throw new Error('You have already requested access.');
+            throw error;
+        }
+
+        alert('Request sent! We will contact you if your application is approved.');
+        closeRequestModal();
+    } catch (err) {
+        console.error('Request error:', err.message);
+        errorEl.textContent = err.message;
+        errorEl.classList.remove('hidden');
+        btn.textContent = 'Send Request';
+        btn.disabled = false;
+    }
 }
 
 // Close login modal

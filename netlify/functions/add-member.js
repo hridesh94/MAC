@@ -25,15 +25,8 @@ exports.handler = async (event, context) => {
 
         if (authError) throw authError;
 
-        // 2. Profile is automatically created via DB Trigger (which we should add)
-        // Or we manually insert it here to be safe
-        const { error: profileError } = await supabase
-            .from('profiles')
-            .insert([
-                { id: user.user.id, email: email, role: 'member' }
-            ]);
-
-        if (profileError) throw profileError;
+        // 2. Profile is automatically created via DB Trigger (supabase_triggers.sql)
+        // We no longer need to manually insert it here, which prevents race conditions/errors.
 
         return {
             statusCode: 200,
