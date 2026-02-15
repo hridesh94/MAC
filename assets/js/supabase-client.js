@@ -71,13 +71,17 @@ initSupabase().catch(error => {
 /**
  * MAC Image CDN Helper
  * Prefixes URLs with Netlify Image CDN for on-the-fly optimization (WebP/Resizing)
+ * Skips CDN for external absolute URLs to prevent 400 errors
  */
 function getCdnUrl(url, width = 800) {
     if (!url) return 'https://via.placeholder.com/800x600?text=No+Image';
-    // If it's a data URL, blob, or localhost, don't use CDN
-    if (url.startsWith('data:') || url.startsWith('blob:') || url.includes('localhost') || url.includes('127.0.0.1')) return url;
-    // Prefix for Netlify optimization
+    // Skip CDN for: data URLs, blobs, localhost, OR absolute URLs (http/https)
+    if (url.startsWith('data:') || url.startsWith('blob:') || url.includes('localhost') || url.includes('127.0.0.1') || url.startsWith('http://') || url.startsWith('https://')) {
+        return url; // Return original URL without CDN processing
+    }
+    // Prefix for Netlify optimization (only for relative URLs)
     return `/.netlify/images?url=${encodeURIComponent(url)}&w=${width}&q=80`;
 }
 
 window.getCdnUrl = getCdnUrl; // Make it globally accessible
+
