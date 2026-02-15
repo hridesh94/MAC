@@ -629,7 +629,8 @@
 
             <div class="text-center">
                 <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span class="material-symbols-outlined text-primary text-3xl">check_circle</span>
+                    <span id="participationIcon"
+                        class="material-symbols-outlined text-primary text-3xl">check_circle</span>
                 </div>
 
                 <h3 class="text-2xl font-serif italic mb-4">Confirm Participation</h3>
@@ -685,6 +686,40 @@
                     <button onclick="confirmIssueCredential()"
                         class="flex-1 rounded-full h-12 px-6 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">
                         Issue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revoke Access Modal (Admin) -->
+    <div id="revokeAccessModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
+        style="display: none;">
+        <div class="glass-card max-w-md w-full mx-4 p-8 rounded-2xl relative">
+            <button onclick="closeRevokeAccessModal()"
+                class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <div class="text-center">
+                <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="material-symbols-outlined text-red-500 text-3xl">warning</span>
+                </div>
+
+                <h3 class="text-2xl font-serif italic mb-4">Revoke Access?</h3>
+                <p class="opacity-80 mb-6 font-medium">This will permanently delete the member's profile and data.</p>
+
+                <p id="revokeAccessError" class="text-red-500 text-sm mb-6 hidden"></p>
+
+                <div class="flex gap-4">
+                    <button onclick="closeRevokeAccessModal()"
+                        class="flex-1 rounded-full h-12 px-6 border-2 border-white/20 text-white text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-all">
+                        Cancel
+                    </button>
+                    <button onclick="confirmRevokeAccess()"
+                        class="flex-1 rounded-full h-12 px-6 bg-red-600 text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-red-600/20 transition-all hover-scale">
+                        Revoke
                     </button>
                 </div>
             </div>

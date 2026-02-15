@@ -167,7 +167,7 @@ function openParticipationModal(slug, eventName, eventDate, action = 'join') {
     // Update Modal Content based on Action
     const modalTitle = document.getElementById('participationModal').querySelector('h3');
     const confirmBtn = document.getElementById('participationModal').querySelector('button[onclick="confirmParticipation()"]');
-    const iconSpan = document.getElementById('participationModal').querySelector('.material-symbols-outlined');
+    const iconSpan = document.getElementById('participationIcon');
 
     document.getElementById('confirmEventName').textContent = eventName;
     document.getElementById('confirmEventDate').textContent = eventDate;

@@ -248,22 +248,61 @@ async function renderAdminMembers() {
 }
 
 // Delete Member (Profile)
-async function deleteMember(userId) {
-    if (!confirm('Are you sure you want to revoke access? This will delete their profile.')) return;
+// Revoke Access (Delete Member) - Trigger Modal
+let pendingRevokeUserId = null;
+
+function deleteMember(userId) {
+    pendingRevokeUserId = userId;
+    const modal = document.getElementById('revokeAccessModal');
+    // Reset error
+    const errorEl = document.getElementById('revokeAccessError');
+    if (errorEl) {
+        errorEl.textContent = '';
+        errorEl.classList.add('hidden');
+    }
+    modal.style.display = 'flex';
+}
+
+function closeRevokeAccessModal() {
+    document.getElementById('revokeAccessModal').style.display = 'none';
+    pendingRevokeUserId = null;
+}
+
+// Actual deletion logic attached to Modal "Revoke" button
+async function confirmRevokeAccess() {
+    if (!pendingRevokeUserId) return;
+
+    const confirmBtn = document.querySelector('#revokeAccessModal button[onclick="confirmRevokeAccess()"]');
+    const originalText = confirmBtn.textContent;
+    const errorEl = document.getElementById('revokeAccessError');
+
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Revoking...';
 
     try {
-        const { error } = await supabase
-            .from('profiles')
-            .delete()
-            .eq('id', userId);
+        // Call Netlify Function to delete user from Auth (which cascades to Profile)
+        const response = await fetch('/.netlify/functions/delete-member', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: pendingRevokeUserId })
+        });
 
-        if (error) throw error;
+        const result = await response.json();
 
-        alert('Access revoked successfully.');
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to revoke access');
+        }
+
+        closeRevokeAccessModal();
+        // Refresh data
         initializeAdminData();
     } catch (err) {
         console.error('Error deleting member:', err.message);
-        alert('Could not revoke access.');
+        errorEl.textContent = 'Could not revoke access. ' + err.message;
+        errorEl.classList.remove('hidden');
+    } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = originalText;
     }
 }
 
