@@ -11,8 +11,9 @@ body {
 .page-section {
     min-height: 100vh;
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
+    transform: translateY(24px);
+    transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .page-section.active {
@@ -55,7 +56,7 @@ body {
     height: 2px;
     background: #d41132;
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .nav-link:hover::after {
@@ -65,7 +66,7 @@ body {
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(36px);
     }
 
     to {
@@ -75,37 +76,38 @@ body {
 }
 
 .fade-in-up {
-    animation: fadeInUp 0.8s ease forwards;
+    animation: fadeInUp 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* Wider stagger gaps — feels more deliberate and cinematic */
 .stagger-1 {
-    animation-delay: 0.1s;
+    animation-delay: 0.15s;
 }
 
 .stagger-2 {
-    animation-delay: 0.2s;
+    animation-delay: 0.35s;
 }
 
 .stagger-3 {
-    animation-delay: 0.3s;
+    animation-delay: 0.55s;
 }
 
 .stagger-4 {
-    animation-delay: 0.4s;
+    animation-delay: 0.75s;
 }
 
 .stagger-5 {
-    animation-delay: 0.5s;
+    animation-delay: 0.95s;
 }
 
 .stagger-6 {
-    animation-delay: 0.6s;
+    animation-delay: 1.15s;
 }
 
 @keyframes slideDown {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-16px);
     }
 
     to {
@@ -115,16 +117,22 @@ body {
 }
 
 header {
-    animation: slideDown 0.6s ease forwards;
+    animation: slideDown 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .mobile-menu {
     transform: translateX(100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .mobile-menu.open {
     transform: translateX(0);
+}
+
+/* Brand text-selection highlight */
+::selection {
+    background: rgba(212, 17, 50, 0.35);
+    color: #ffffff;
 }
 
 /* Membership section should not force full viewport height */
@@ -132,18 +140,112 @@ header {
     min-height: auto !important;
 }
 
+/* ----------------------------------------------------------------
+   MOBILE OPTIMIZATIONS  (≤ 768px)
+   ---------------------------------------------------------------- */
 @media (max-width: 768px) {
+
+    /* ── HERO ── */
+
+    /* Title: dominant hero element — should read big */
     .hero-title {
-        font-size: 2.5rem !important;
+        font-size: 3.5rem !important;
+        line-height: 1.05 !important;
+        margin-bottom: 1rem !important;
     }
 
+    /* Subtitle: clearly secondary, pull it back */
+    #home h2 {
+        font-size: 0.95rem !important;
+        line-height: 1.6 !important;
+        margin-bottom: 1.5rem !important;
+        opacity: 0.75;
+    }
+
+    /* "Discover MAC" button: compact, not full-width pill */
+    #home .flex button {
+        height: 2.75rem !important;
+        /* 44px */
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        font-size: 0.7rem !important;
+        min-width: auto !important;
+        width: auto !important;
+    }
+
+    /* iOS: background-attachment:fixed doesn't work on Safari */
+    #home>.absolute,
+    #dashboard-welcome>.absolute {
+        background-attachment: scroll !important;
+    }
+
+    /* Disable parallax on mobile */
+    #home .z-10 {
+        transform: none !important;
+    }
+
+    /* ── PHILOSOPHY ── */
+
+    /* Section headings */
     .section-title {
+        font-size: 1.8rem !important;
+    }
+
+    /* Value cards: shorten aspect ratio so they don't eat whole screen */
+    #philosophy .grid>div {
+        aspect-ratio: 4 / 3 !important;
+    }
+
+    /* Split panel: tighter on mobile */
+    #philosophy>div>div:last-child {
+        padding: 1.5rem !important;
+        gap: 1.5rem !important;
+    }
+
+    /* ── MEMBERSHIP ── */
+
+    /* Section heading */
+    #membership h1 {
         font-size: 2rem !important;
+    }
+
+    /* Body copy: pull back */
+    #membership p {
+        font-size: 0.9rem !important;
+    }
+
+    /* Buttons: proportional height, full width is fine but not 64px tall */
+    #membership button {
+        height: 3rem !important;
+        /* 48px instead of 64px */
+        min-width: 0 !important;
+        width: 100% !important;
+        font-size: 0.7rem !important;
+        letter-spacing: 0.15em !important;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+
+    /* ── MOBILE MENU ── */
+    .mobile-menu nav a {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* ── MEMBERS DASHBOARD ── */
+    #dashboard-welcome h1 {
+        font-size: 2.5rem !important;
     }
 }
 
 .hover-scale {
-    transition: transform 0.3s ease;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
 }
 
 .hover-scale:hover {
@@ -155,7 +257,8 @@ header {
 }
 
 .page-transition {
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .page-hidden {
@@ -170,4 +273,69 @@ header {
     transform: translateY(0);
     pointer-events: auto;
     position: relative;
+}
+
+/* Aurora text effect */
+@keyframes aurora-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.aurora-text {
+    background: linear-gradient(135deg,
+            #d41132 0%,
+            #ff3355 15%,
+            #b99da1 30%,
+            #ffffff 45%,
+            #ff6b6b 60%,
+            #d41132 75%,
+            #ff2244 90%,
+            #b99da1 100%);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: aurora-shift 5s ease infinite;
+    display: inline;
+}
+
+/* ------------------------------------------------------------------
+   Scroll Reveal — cinematic ease-out entries
+   ------------------------------------------------------------------ */
+.reveal-up {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-up.revealed,
+.reveal-left.revealed,
+.reveal-right.revealed {
+    opacity: 1;
+    transform: translate(0, 0);
 }
