@@ -340,7 +340,7 @@ function showExperience(slug) {
                                         </button>`;
                 }
                 return `<button onclick="openParticipationModal('${experience.slug}', '${experience.title}', '${experience.date}')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
-                                        Already Secured
+                                        Secure Participation
                                     </button>`;
             } else {
                 // Public view - prompt to login
