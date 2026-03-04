@@ -333,18 +333,18 @@ function showExperience(slug) {
                                     </button>`;
             } else if (previousViewId === 'membersDashboard') {
                 // Member view - show participation button
-                const registeredEvents = JSON.parse(sessionStorage.getItem('registeredEvents') || '[]');
-                if (registeredEvents.includes(experience.slug)) {
-                    return `<button class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-white/10 border border-white/20 text-white/50 text-sm font-black uppercase tracking-widest cursor-not-allowed">
+                const userRegistrations = JSON.parse(sessionStorage.getItem('userRegistrations') || '[]');
+                if (userRegistrations.includes(experience.slug)) {
+                    return `<button disabled class="inline-flex h-16 w-full items-center justify-center rounded-full bg-white/10 border border-white/20 text-white/50 text-sm font-black uppercase tracking-widest cursor-not-allowed">
                                             Already Registered
                                         </button>`;
                 }
-                return `<button onclick="openParticipationModal('${experience.slug}', '${experience.title}', '${experience.date}')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
+                return `<button onclick="openParticipationModal('${experience.slug}', '${experience.title}', '${experience.date}')" class="inline-flex h-16 w-full items-center justify-center rounded-full bg-primary text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
                                         Secure Participation
                                     </button>`;
             } else {
                 // Public view - prompt to login
-                return `<button onclick="navigateTo('login')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
+                return `<button onclick="navigateTo('login')" class="inline-flex h-16 w-full items-center justify-center rounded-full bg-primary text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
                                         Secure Participation
                                     </button>`;
             }
