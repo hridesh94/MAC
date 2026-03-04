@@ -364,7 +364,7 @@ function deleteMember(userId) {
         "This will permanently delete the member's profile and data.",
         'Revoke',
         async () => {
-            const response = await fetch('/.netlify/functions/delete-member', {
+            const response = await fetch('/api/delete-member', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId })
@@ -623,7 +623,7 @@ async function confirmIssueCredential() {
     errorEl.classList.add('hidden');
 
     try {
-        const response = await fetch('/.netlify/functions/add-member', {
+        const response = await fetch('/api/add-member', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })

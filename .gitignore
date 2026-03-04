@@ -2,3 +2,6 @@
 /mac-website-complete.bak
 /server.log
 /tunnel.log
+node_modules/
+.wrangler/
+.DS_Store
