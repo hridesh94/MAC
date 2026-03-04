@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MAC — Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d41132",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#181112",
+                        "charcoal": "#221013",
+                        "blush": "#b99da1",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script>
+            // Auth guard — redirect to landing if not authenticated as admin
+            (function () {
+                var auth = sessionStorage.getItem('macAuthenticated');
+                var role = sessionStorage.getItem('userRole');
+                if (auth !== 'true' || role !== 'admin') {
+                    window.location.replace('index.html');
+                }
+            })();
+    </script>
+</head>
+
+<body class="bg-background-dark font-display text-white transition-colors duration-300">
+
+    <!-- Super Admin Dashboard -->
+    <div id="adminDashboard">
+        <!-- Admin Header -->
+        <nav class="fixed w-full z-50 transition-all duration-300 bg-black/80 backdrop-blur-md border-b border-white/10"
+            id="adminNavbar">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex justify-between items-center h-24">
+                    <!-- Logo -->
+                    <a href="index.html" class="flex items-center gap-1 group">
+                        <div class="text-amber-500 transition-transform group-hover:scale-110 duration-300"
+                            style="width:28px;height:28px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="400 432 300 192" fill="currentColor"
+                                width="28" height="28" aria-hidden="true">
+                                <path
+                                    d="M546.576 606.024c-5.543 2.025-10.69 4.343-15.987 6.246-32.432 11.65-62.68 7.02-90.257-13.289-20.49-15.089-32.482-35.742-36.926-60.804-7.317-41.265 14.935-83.598 53.083-101.327 28.464-13.228 56.648-12.572 84.662 1.142 3.285 1.607 5.949 1.706 9.337-.014 58.317-29.605 127.777 5.89 137.927 70.377 8.269 52.53-29.037 102.155-81.726 109.124-21.293 2.816-41.01-1.505-60.113-11.455m-11.572-161.013c-39.008-18.993-85.436-6.448-109.703 30.04-22.896 34.426-18.3 80.89 12.84 111.032 30.576 29.597 77.907 27.024 98.12 13.394-1.495-3.156-4.73-4.524-7.098-6.732-43.17-40.257-39.06-108.806 4.459-143.681 1.074-.86 3.49-1.36 1.382-4.053m24.246-1.414c-1.233.756-2.87.993-3.613 3.103 23.927 19.522 37.275 44.878 37.31 75.996.033 31.3-13.12 56.878-37.865 76.33 18.546 13.891 64.754 16.09 94.605-9.428 32.515-27.794 40.779-75.61 18.749-111.358-22.982-37.293-68.935-52.082-109.186-34.643m-1.66 113.313c4.151 3.956 7.772 8.51 12.518 11.786 6.724-7.433 6.752-8.373.3-14.862-17.717-17.818-35.446-35.625-53.226-53.381-1.552-1.55-2.887-3.55-5.058-4.203-4.091 7.336-3.062 12.805 3.187 18.638 14.345 13.392 27.908 27.623 42.28 42.022m-36.495-66.492 58.285 58.084c4.528-9.94 4.356-11.013-2.097-17.453-16.964-16.932-33.916-33.875-50.896-50.79-1.383-1.378-2.535-3.112-4.582-3.628-6.026 5.132-6.27 7.955-.71 13.787m32.137-13.141c-4.476-4.479-8.905-9.005-13.44-13.423-4.702-4.58-5.686-4.289-9.75.634-2.568 3.111-.639 4.864 1.224 6.738a22219 22219 0 0 0 49.416 49.542c.647.648 1.324 1.626 2.907.828.376-7.57.27-14.748-6.379-20.682-8.19-7.31-15.693-15.388-23.978-23.637m-4.183 85.176-40.747-40.66-1.208.718c1.824 5.86-.863 12.615 4.345 17.819 14.138 14.126 28.283 28.247 42.303 42.49 3.08 3.128 4.848 1.089 6.974-.957 2.198-2.115 4.054-4.023.904-6.959-4.14-3.858-8.055-7.959-12.571-12.45m-11.676 17.673-20.106-21.855-1.5 1.469c6.33 12.991 14.971 24.125 26.724 32.738 2.083 1.527 4.249 2.995 6.661-2.021-3.54-3.085-7.41-6.458-11.78-10.331m23.07-117.065c-3.9-3.374-7.75-6.805-11.726-10.086-1.209-.998-2.856-2.45-4.326-.567-1.353 1.734.626 2.657 1.574 3.617a4539 4539 0 0 0 25.738 25.837c.692.69 1.255 1.908 2.884 1.567-3.519-7.544-8.238-13.94-14.145-20.368" />
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-bold tracking-tighter">MAC <span
+                                class="text-amber-500 text-sm align-top ml-1">ADMIN</span></span>
+                    </a>
+
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:flex items-center gap-8">
+                        <button onclick="switchAdminTab('events')"
+                            class="admin-nav-link text-sm uppercase tracking-widest hover:text-amber-500 transition-colors text-amber-500"
+                            id="nav-events">Events</button>
+                        <button onclick="switchAdminTab('members')"
+                            class="admin-nav-link text-sm uppercase tracking-widest hover:text-amber-500 transition-colors opacity-60"
+                            id="nav-members">Members</button>
+                        <button onclick="switchAdminTab('registrations')"
+                            class="admin-nav-link text-sm uppercase tracking-widest hover:text-amber-500 transition-colors opacity-60"
+                            id="nav-registrations">Status</button>
+                        <button onclick="switchAdminTab('requests')"
+                            class="admin-nav-link text-sm uppercase tracking-widest hover:text-amber-500 transition-colors opacity-60"
+                            id="nav-requests">Requests</button>
+                        <button onclick="handleLogout()"
+                            class="px-6 py-2 border border-amber-500/50 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Admin Content -->
+        <div class="pt-32 px-6 pb-20 max-w-7xl mx-auto">
+            <!-- Welcome Section -->
+            <div class="mb-12">
+                <h1 class="text-4xl md:text-5xl font-serif italic mb-4">Admin Dashboard</h1>
+                <p class="text-white/60">Manage events, members, and platform content.</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="glass-card p-6 rounded-xl border border-white/5 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all">
+                    </div>
+                    <h3 class="text-sm uppercase tracking-widest opacity-60 mb-2">Total Events</h3>
+                    <div class="text-4xl font-bold" id="adminTotalEvents">0</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl border border-white/5 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all">
+                    </div>
+                    <h3 class="text-sm uppercase tracking-widest opacity-60 mb-2">Active Members</h3>
+                    <div class="text-4xl font-bold" id="adminTotalMembers">0</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl border border-white/5 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all">
+                    </div>
+                    <h3 class="text-sm uppercase tracking-widest opacity-60 mb-2">Registrations</h3>
+                    <div class="text-4xl font-bold" id="adminTotalRegistrations">0</div>
+                </div>
+            </div>
+
+            <!-- Events Management Tab -->
+            <div id="admin-tab-events" class="admin-tab-content">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-serif italic">Events Management</h2>
+                    <button onclick="openAddEventModal()"
+                        class="flex items-center gap-2 px-6 py-3 bg-amber-500 text-black rounded-full font-bold uppercase tracking-widest text-xs hover:shadow-lg hover:shadow-amber-500/20 transition-all">
+                        <span class="material-symbols-outlined text-lg">add</span>
+                        Add Event
+                    </button>
+                </div>
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-white/5 text-xs uppercase tracking-widest">
+                                <tr>
+                                    <th class="p-6">Event Details</th>
+                                    <th class="p-6">Date & Location</th>
+                                    <th class="p-6">Participants</th>
+                                    <th class="p-6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5" id="adminEventsTable">
+                                <!-- Events populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Members Management Tab -->
+            <div id="admin-tab-members" class="admin-tab-content hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-serif italic">Members Credentials</h2>
+                    <button onclick="openAddMemberModal()"
+                        class="flex items-center gap-2 px-6 py-3 bg-amber-500 text-black rounded-full font-bold uppercase tracking-widest text-xs hover:shadow-lg hover:shadow-amber-500/20 transition-all">
+                        <span class="material-symbols-outlined text-lg">person_add</span>
+                        Issue Credential
+                    </button>
+                </div>
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-white/5 text-xs uppercase tracking-widest">
+                                <tr>
+                                    <th class="p-6">Member Info</th>
+                                    <th class="p-6">Status</th>
+                                    <th class="p-6">Issued Date</th>
+                                    <th class="p-6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5" id="adminMembersTable">
+                                <!-- Members populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registration Status Tab -->
+            <div id="admin-tab-registrations" class="admin-tab-content hidden">
+                <h2 class="text-2xl font-serif italic mb-8">Registration Analytics</h2>
+                <div class="glass-card p-12 text-center rounded-xl border-dashed border-2 border-white/10">
+                    <span class="material-symbols-outlined text-6xl text-white/20 mb-4">analytics</span>
+                    <h3 class="text-xl font-bold mb-2">Analytics Dashboard</h3>
+                    <p class="text-white/60 max-w-md mx-auto">Registration trends and export functionality coming in
+                        next update.</p>
+                </div>
+            </div>
+
+            <!-- Access Requests Tab -->
+            <div id="admin-tab-requests" class="admin-tab-content hidden">
+                <h2 class="text-2xl font-serif italic mb-8">Access Requests</h2>
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-white/5 text-xs uppercase tracking-widest">
+                                <tr>
+                                    <th class="p-6">Email</th>
+                                    <th class="p-6">Date</th>
+                                    <th class="p-6">Status</th>
+                                    <th class="p-6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5" id="adminRequestsTable">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issue Credential Modal -->
+    <div id="issueCredentialModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
+        style="display: none;">
+        <div class="glass-card max-w-md w-full mx-4 p-8 rounded-2xl relative">
+            <button onclick="closeIssueCredentialModal()"
+                class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="material-symbols-outlined text-primary text-3xl">badge</span>
+                </div>
+
+                <h3 class="text-2xl font-serif italic mb-4">Issue Credential</h3>
+                <p class="opacity-80 mb-6 font-medium">Enter the email address for the new member</p>
+
+                <input type="email" id="newMemberEmail" placeholder="member@example.com"
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-center mb-4 focus:border-primary focus:outline-none transition-colors">
+
+                <input type="password" id="newMemberPassword" placeholder="Temporary Password"
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-center mb-6 focus:border-primary focus:outline-none transition-colors">
+
+                <p id="issueCredentialError" class="text-red-500 text-sm mb-6 hidden"></p>
+
+                <div class="flex gap-4">
+                    <button onclick="closeIssueCredentialModal()"
+                        class="flex-1 rounded-full h-12 px-6 border-2 border-white/20 text-white text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-all">
+                        Cancel
+                    </button>
+                    <button onclick="confirmIssueCredential()"
+                        class="flex-1 rounded-full h-12 px-6 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">
+                        Issue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Danger Modal -->
+    <div id="dangerModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
+        style="display: none;">
+        <div class="glass-card max-w-md w-full mx-4 p-8 rounded-2xl relative">
+            <button onclick="closeDangerModal()"
+                class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <div class="text-center">
+                <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="material-symbols-outlined text-red-500 text-3xl">warning</span>
+                </div>
+
+                <h3 id="dangerTitle" class="text-2xl font-serif italic mb-4">Are you sure?</h3>
+                <p id="dangerMessage" class="opacity-80 mb-6 font-medium">This action cannot be undone.</p>
+
+                <p id="dangerError" class="text-red-500 text-sm mb-6 hidden"></p>
+
+                <div class="flex gap-4">
+                    <button onclick="closeDangerModal()"
+                        class="flex-1 rounded-full h-12 px-6 border-2 border-white/20 text-white text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-all">
+                        Cancel
+                    </button>
+                    <button id="dangerConfirmBtn" onclick="confirmDangerAction()"
+                        class="flex-1 rounded-full h-12 px-6 bg-red-600 text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-red-600/20 transition-all hover-scale">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div id="adminEventModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
+        style="display: none;">
+        <div class="glass-card max-w-2xl w-full mx-4 p-8 rounded-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeAddEventModal()"
+                class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <h2 id="modalTitle" class="text-2xl font-serif italic mb-6">Add New Event</h2>
+
+            <form onsubmit="handleAdminAddEvent(event)" class="space-y-6">
+                <input type="hidden" id="eventId" name="eventId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Event Title</label>
+                        <input type="text" name="title" required
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Category</label>
+                        <select name="category"
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                            <option value="Sand" class="bg-charcoal">Sand</option>
+                            <option value="Water" class="bg-charcoal">Water</option>
+                            <option value="Road" class="bg-charcoal">Road</option>
+                            <option value="Sky" class="bg-charcoal">Sky</option>
+                            <option value="Snow" class="bg-charcoal">Snow</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Date (Display
+                            Text)</label>
+                        <input type="text" name="date" placeholder="e.g. October 2026" required
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Location</label>
+                        <input type="text" name="location" required
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                </div>
+
+                <!-- Countdown + Capacity -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Event Date <span
+                                class="text-white/30 normal-case font-normal">(for countdown timer)</span></label>
+                        <input type="date" name="event_date"
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Max Capacity <span
+                                class="text-white/30 normal-case font-normal">(spots)</span></label>
+                        <input type="number" name="capacity" placeholder="e.g. 20" min="1"
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                </div>
+
+                <!-- Event Details Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Departure Point</label>
+                        <input type="text" name="departure_point" placeholder="e.g. Dubai International Airport"
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Transfer Type</label>
+                        <input type="text" name="transfer_type" placeholder="e.g. Private 4×4 Convoy"
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Active Duration</label>
+                        <input type="text" name="active_duration" placeholder="e.g. 2 Days Active"
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Itinerary
+                            Dispatch</label>
+                        <input type="text" name="itinerary_dispatch" placeholder="e.g. 7 Days Prior"
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <label class="text-xs font-bold uppercase tracking-widest text-primary">Experience Image</label>
+                    <div class="flex flex-col gap-4">
+                        <!-- File Upload UI -->
+                        <div class="relative group cursor-pointer border-2 border-dashed border-white/20 rounded-xl p-6 hover:border-primary transition-colors text-center"
+                            onclick="document.getElementById('eventImageUpload').click()">
+                            <input type="file" id="eventImageUpload" accept="image/*" class="hidden"
+                                onchange="handleImageSelection(event)">
+                            <div id="uploadPlaceholder" class="space-y-2">
+                                <span
+                                    class="material-symbols-outlined text-4xl opacity-40 group-hover:text-primary transition-colors">cloud_upload</span>
+                                <p class="text-xs opacity-60">Click to upload or drag and drop</p>
+                                <p class="text-[10px] opacity-40">Auto-optimized for performance</p>
+                            </div>
+                            <div id="uploadPreview"
+                                class="hidden relative aspect-video rounded-lg overflow-hidden border border-white/10">
+                                <img id="previewImg" src="" class="w-full h-full object-cover">
+                                <button type="button" onclick="event.stopPropagation(); removeSelectedImage()"
+                                    class="absolute top-2 right-2 bg-black/60 p-2 rounded-full hover:bg-red-500 transition-colors">
+                                    <span class="material-symbols-outlined text-xs">close</span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Manual URL (Optional) -->
+                        <div class="flex items-center gap-3">
+                            <div class="h-px flex-1 bg-white/10"></div>
+                            <span class="text-[10px] uppercase tracking-widest opacity-40">OR</span>
+                            <div class="h-px flex-1 bg-white/10"></div>
+                        </div>
+                        <input type="url" name="image" id="imageUrlInput" placeholder="Paste Image URL"
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-widest text-primary">Description</label>
+                    <textarea name="description" rows="3" required
+                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors"></textarea>
+                </div>
+
+                <!-- Itinerary Builder -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold uppercase tracking-widest text-primary">Itinerary Phases</label>
+                        <button type="button" onclick="addItineraryRow()"
+                            class="flex items-center gap-1 px-3 py-1.5 bg-white/5 border border-white/10 hover:border-primary rounded-lg text-xs font-bold uppercase tracking-widest transition-colors">
+                            <span class="material-symbols-outlined text-sm">add</span> Add Phase
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-white/30">If left empty, a default itinerary for the event category is
+                        shown automatically.</p>
+                    <div id="itineraryRows" class="space-y-3">
+                        <!-- Rows injected by addItineraryRow() -->
+                    </div>
+                </div>
+
+                <p id="eventModalError" class="text-red-500 text-sm hidden"></p>
+                <div class="pt-4 flex gap-4">
+                    <button type="button" onclick="closeAddEventModal()"
+                        class="flex-1 px-6 py-3 border border-white/20 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" id="submitBtn"
+                        class="flex-1 px-6 py-3 bg-primary text-white rounded-full text-sm font-bold uppercase tracking-widest hover:bg-primary/80 transition-colors shadow-lg shadow-primary/20">
+                        Create Event
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Experience Detail Pages Container -->
+    <div id="experienceDetail" class="page-transition page-hidden"></div>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-client.js"></script>
+
+    <script src="assets/js/image-optimizer.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/admin.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

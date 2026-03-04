@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MAC — Member Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d41132",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#181112",
+                        "charcoal": "#221013",
+                        "blush": "#b99da1",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script>
+            // Auth guard — redirect to landing if not authenticated as a member
+            (function () {
+                var auth = sessionStorage.getItem('macAuthenticated');
+                var role = sessionStorage.getItem('userRole');
+                if (auth !== 'true' || role === 'admin') {
+                    window.location.replace('index.html');
+                }
+            })();
+    </script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-charcoal dark:text-white transition-colors duration-300">
+
+    <!-- Members Dashboard -->
+    <div id="membersDashboard">
+        <!-- Dashboard Header -->
+        <header
+            class="fixed top-0 left-0 right-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-blush/20">
+            <div class="max-w-[1200px] mx-auto px-6 lg:px-10">
+                <div class="flex items-center justify-between py-5">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-1 group cursor-pointer"
+                        onclick="window.location.href='index.html'">
+                        <div class="text-primary transition-transform group-hover:scale-110 duration-300"
+                            style="width:28px;height:28px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="400 432 300 192" fill="currentColor"
+                                width="28" height="28" aria-hidden="true">
+                                <path
+                                    d="M546.576 606.024c-5.543 2.025-10.69 4.343-15.987 6.246-32.432 11.65-62.68 7.02-90.257-13.289-20.49-15.089-32.482-35.742-36.926-60.804-7.317-41.265 14.935-83.598 53.083-101.327 28.464-13.228 56.648-12.572 84.662 1.142 3.285 1.607 5.949 1.706 9.337-.014 58.317-29.605 127.777 5.89 137.927 70.377 8.269 52.53-29.037 102.155-81.726 109.124-21.293 2.816-41.01-1.505-60.113-11.455m-11.572-161.013c-39.008-18.993-85.436-6.448-109.703 30.04-22.896 34.426-18.3 80.89 12.84 111.032 30.576 29.597 77.907 27.024 98.12 13.394-1.495-3.156-4.73-4.524-7.098-6.732-43.17-40.257-39.06-108.806 4.459-143.681 1.074-.86 3.49-1.36 1.382-4.053m24.246-1.414c-1.233.756-2.87.993-3.613 3.103 23.927 19.522 37.275 44.878 37.31 75.996.033 31.3-13.12 56.878-37.865 76.33 18.546 13.891 64.754 16.09 94.605-9.428 32.515-27.794 40.779-75.61 18.749-111.358-22.982-37.293-68.935-52.082-109.186-34.643m-1.66 113.313c4.151 3.956 7.772 8.51 12.518 11.786 6.724-7.433 6.752-8.373.3-14.862-17.717-17.818-35.446-35.625-53.226-53.381-1.552-1.55-2.887-3.55-5.058-4.203-4.091 7.336-3.062 12.805 3.187 18.638 14.345 13.392 27.908 27.623 42.28 42.022m-36.495-66.492 58.285 58.084c4.528-9.94 4.356-11.013-2.097-17.453-16.964-16.932-33.916-33.875-50.896-50.79-1.383-1.378-2.535-3.112-4.582-3.628-6.026 5.132-6.27 7.955-.71 13.787m32.137-13.141c-4.476-4.479-8.905-9.005-13.44-13.423-4.702-4.58-5.686-4.289-9.75.634-2.568 3.111-.639 4.864 1.224 6.738a22219 22219 0 0 0 49.416 49.542c.647.648 1.324 1.626 2.907.828.376-7.57.27-14.748-6.379-20.682-8.19-7.31-15.693-15.388-23.978-23.637m-4.183 85.176-40.747-40.66-1.208.718c1.824 5.86-.863 12.615 4.345 17.819 14.138 14.126 28.283 28.247 42.303 42.49 3.08 3.128 4.848 1.089 6.974-.957 2.198-2.115 4.054-4.023.904-6.959-4.14-3.858-8.055-7.959-12.571-12.45m-11.676 17.673-20.106-21.855-1.5 1.469c6.33 12.991 14.971 24.125 26.724 32.738 2.083 1.527 4.249 2.995 6.661-2.021-3.54-3.085-7.41-6.458-11.78-10.331m23.07-117.065c-3.9-3.374-7.75-6.805-11.726-10.086-1.209-.998-2.856-2.45-4.326-.567-1.353 1.734.626 2.657 1.574 3.617a4539 4539 0 0 0 25.738 25.837c.692.69 1.255 1.908 2.884 1.567-3.519-7.544-8.238-13.94-14.145-20.368" />
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-bold leading-tight tracking-widest">MAC</h2>
+                    </div>
+
+                    <nav class="hidden md:flex items-center gap-8">
+                        <a href="#dashboard-welcome" class="nav-link text-sm font-medium text-primary">Dashboard</a>
+                        <a href="#dashboard-events"
+                            class="nav-link text-sm font-medium hover:text-primary transition-colors">Available
+                            Events</a>
+                        <a href="#dashboard-my-events"
+                            class="nav-link text-sm font-medium hover:text-primary transition-colors">My Events</a>
+                    </nav>
+
+                    <button onclick="handleLogout()"
+                        class="flex items-center justify-center rounded-lg h-10 px-5 bg-primary/10 border border-primary text-primary text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all hover:opacity-90">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="pt-20">
+            <!-- Welcome Section -->
+            <section id="dashboard-welcome"
+                class="page-section min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                    style='background-image: linear-gradient(rgba(24, 17, 18, 0.6) 0%, rgba(24, 17, 18, 0.8) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDA68o1G9Nu8tWQLFxSlZXxeGu0BWRq5X8kKA6jKBPE6DRDs0pJnbKUo5Q7-xeuaIXg6G30BOQvw90aGzVED8KBIvUQDZeSfDAwe9SNU84ouxSjdjLxLFkHnqtc1ghYvzDIF3odm8TOfzVCIxQ2fm61QsRHMdZ0vhSkzra6nY6yXv8FAlnJSbOYp79olGt3Ntj6WbzHUzVyOeP5uarfE0D8DzVPZETkijnhI0XNueKCgnwHHDYwf9vxNstBkRpxLtFPMu-xJNgyBK-o");'>
+                </div>
+
+                <div class="relative z-10 text-center px-6 max-w-[900px] mx-auto">
+                    <h1
+                        class="text-5xl md:text-7xl lg:text-8xl font-serif italic font-bold leading-tight mb-6 fade-in-up">
+                        Welcome, <span id="memberGreeting">Member</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl opacity-80 mb-12 fade-in-up" style="animation-delay: 0.1s;">
+                        Your exclusive access to limitless experiences
+                    </p>
+
+                    <div class="glass-card inline-block p-8 rounded-2xl fade-in-up" style="animation-delay: 0.2s;">
+                        <div class="flex items-center gap-8 md:gap-12">
+                            <div class="text-center">
+                                <div class="text-4xl md:text-5xl font-bold text-primary mb-2" id="registeredCount">0
+                                </div>
+                                <div class="text-xs md:text-sm uppercase tracking-widest opacity-60">Events Registered
+                                </div>
+                            </div>
+                            <div class="h-12 w-px bg-blush/20"></div>
+                            <div class="text-center">
+                                <div class="text-4xl md:text-5xl font-bold text-blush mb-2" id="availableCount">0</div>
+                                <div class="text-xs md:text-sm uppercase tracking-widest opacity-60">Available</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Available Events Section -->
+            <section id="dashboard-events" class="page-section py-20 lg:py-32 px-6 lg:px-40">
+                <div class="max-w-[1100px] mx-auto">
+                    <div class="text-center mb-16">
+                        <p class="text-primary dark:text-blush text-xs font-bold uppercase-tracking pb-4">Exclusive
+                            Members-Only Adrenaline Calendar</p>
+                        <h1 class="section-title text-4xl md:text-6xl font-serif italic font-bold leading-tight pb-6">
+                            Available Events</h1>
+                        <div class="w-24 h-1 bg-primary mx-auto"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12" id="availableEventsGrid">
+                        <!-- Events populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Events Section -->
+            <section id="dashboard-my-events" class="page-section py-20 lg:py-32 px-6 lg:px-40 bg-primary/5">
+                <div class="max-w-[1100px] mx-auto">
+                    <div class="text-center mb-16">
+                        <p class="text-primary dark:text-blush text-xs font-bold uppercase-tracking pb-4">Your Confirmed
+                            Experiences</p>
+                        <h1 class="section-title text-4xl md:text-6xl font-serif italic font-bold leading-tight pb-6">My
+                            Events</h1>
+                        <div class="w-24 h-1 bg-primary mx-auto"></div>
+                    </div>
+
+                    <div id="myEventsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <!-- Registered events populated by JavaScript -->
+                    </div>
+
+                    <div id="myEventsEmpty" class="text-center py-20" style="display: none;">
+                        <div class="glass-card p-12 rounded-2xl inline-block max-w-md">
+                            <span class="material-symbols-outlined text-6xl opacity-40 mb-6 block">calendar_month</span>
+                            <h3 class="text-2xl font-serif italic mb-4">No Events Registered</h3>
+                            <p class="opacity-60 mb-6 text-sm">Secure your spot in our exclusive experiences</p>
+                            <a href="#dashboard-events"
+                                class="inline-flex items-center justify-center rounded-full h-12 px-8 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">
+                                Browse Events
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Participation Confirmation Modal -->
+    <div id="participationModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
+        style="display: none;">
+        <div class="glass-card max-w-md w-full mx-4 p-8 rounded-2xl relative">
+            <button onclick="closeParticipationModal()"
+                class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span id="participationIcon"
+                        class="material-symbols-outlined text-primary text-3xl">check_circle</span>
+                </div>
+
+                <h3 class="text-2xl font-serif italic mb-4">Confirm Participation</h3>
+                <p class="opacity-80 mb-2 font-medium" id="confirmEventName">Event Name</p>
+                <p class="text-sm opacity-60 mb-8" id="confirmEventDate">Event Date</p>
+                <p id="participationError" class="text-red-500 text-sm mb-6 hidden"></p>
+
+                <div class="flex gap-4">
+                    <button onclick="closeParticipationModal()"
+                        class="flex-1 rounded-full h-12 px-6 border-2 border-white/20 text-white text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-all">
+                        Cancel
+                    </button>
+                    <button onclick="confirmParticipation()"
+                        class="flex-1 rounded-full h-12 px-6 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Experience Detail Pages Container -->
+    <div id="experienceDetail" class="page-transition page-hidden"></div>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-client.js"></script>
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/member.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

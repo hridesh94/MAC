@@ -1,15 +1,81 @@
-// Show admin dashboard
-function showAdminDashboard() {
-    // Hide main site and member dashboard
-    document.getElementById('mainSite').style.display = 'none';
-    document.getElementById('membersDashboard').style.display = 'none';
+// Auto-initialize admin data when admin.html loads
+window.addEventListener('load', () => {
+    if (document.getElementById('adminDashboard')) {
+        initializeAdminData();
+    }
+});
 
-    // Show admin dashboard
-    document.getElementById('adminDashboard').style.display = 'block';
+// ── Itinerary Builder ────────────────────────────────────────────────────────
+let _itinRowId = 0;
 
-    // Initialize admin data
-    initializeAdminData();
+function addItineraryRow(data = {}) {
+    const id = ++_itinRowId;
+    const container = document.getElementById('itineraryRows');
+    const row = document.createElement('div');
+    row.id = `irow-${id}`;
+    row.className = 'relative border border-white/10 rounded-xl p-4 space-y-3 bg-white/[0.02]';
+    row.innerHTML = `
+        <button type="button" onclick="removeItineraryRow(${id})"
+            class="absolute top-3 right-3 text-white/30 hover:text-red-500 transition-colors">
+            <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="text-[9px] font-black uppercase tracking-widest text-white/30 block mb-1">Time / Phase Label</label>
+                <input type="text" name="itin_time_${id}" placeholder="e.g. Day 01 — 06:00" value="${data.time || ''}"
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-primary focus:outline-none transition-colors">
+            </div>
+            <div>
+                <label class="text-[9px] font-black uppercase tracking-widest text-white/30 block mb-1">Title</label>
+                <input type="text" name="itin_title_${id}" placeholder="e.g. Convoy Departure" value="${data.title || ''}"
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-primary focus:outline-none transition-colors">
+            </div>
+        </div>
+        <div>
+            <label class="text-[9px] font-black uppercase tracking-widest text-white/30 block mb-1">Description</label>
+            <textarea name="itin_desc_${id}" rows="2" placeholder="Short description of this phase…"
+                class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-primary focus:outline-none transition-colors resize-none">${data.desc || ''}</textarea>
+        </div>
+        <div class="flex items-center gap-6">
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" name="itin_key_${id}" ${data.key ? 'checked' : ''}
+                    class="accent-primary w-4 h-4">
+                <span class="text-[10px] font-black uppercase tracking-widest text-white/50">Key Moment</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" name="itin_optional_${id}" ${data.optional ? 'checked' : ''}
+                    class="accent-primary w-4 h-4">
+                <span class="text-[10px] font-black uppercase tracking-widest text-white/50">Optional</span>
+            </label>
+        </div>`;
+    container.appendChild(row);
 }
+
+function removeItineraryRow(id) {
+    const el = document.getElementById(`irow-${id}`);
+    if (el) el.remove();
+}
+
+function getItineraryFormData() {
+    const rows = document.querySelectorAll('#itineraryRows > div[id^="irow-"]');
+    const phases = [];
+    rows.forEach(row => {
+        const idNum = row.id.replace('irow-', '');
+        const time = row.querySelector(`[name="itin_time_${idNum}"]`)?.value?.trim();
+        const title = row.querySelector(`[name="itin_title_${idNum}"]`)?.value?.trim();
+        const desc = row.querySelector(`[name="itin_desc_${idNum}"]`)?.value?.trim();
+        const key = row.querySelector(`[name="itin_key_${idNum}"]`)?.checked ?? false;
+        const opt = row.querySelector(`[name="itin_optional_${idNum}"]`)?.checked ?? false;
+        if (title) phases.push({ time: time || '', title, desc: desc || '', key, optional: opt });
+    });
+    return phases.length ? phases : null;
+}
+
+function clearItineraryRows() {
+    document.getElementById('itineraryRows').innerHTML = '';
+    _itinRowId = 0;
+}
+// ── End Itinerary Builder ────────────────────────────────────────────────────
 
 // Media Management State
 let selectedImageFile = null;
@@ -356,6 +422,8 @@ function openAddEventModal() {
 
     // Clear Image state
     removeSelectedImage();
+    // Clear itinerary rows
+    clearItineraryRows();
 
     modal.style.display = 'flex';
 }
@@ -384,13 +452,21 @@ async function openEditEventModal(identifier) {
         form.querySelector('[name="category"]').value = event.category || 'Sand';
         form.querySelector('[name="date"]').value = event.date || '';
         form.querySelector('[name="location"]').value = event.location || '';
-        form.querySelector('[name="duration"]').value = event.duration || '';
-        form.querySelector('[name="equipment"]').value = event.equipment || 'Standard';
-        form.querySelector('[name="difficulty"]').value = event.difficulty || 'All Levels';
-        form.querySelector('[name="image"]').value = event.image || ''; // Ensure manual URL input is populated
+        form.querySelector('[name="event_date"]').value = event.event_date || '';
+        form.querySelector('[name="capacity"]').value = event.capacity || '';
+        form.querySelector('[name="departure_point"]').value = event.departure_point || '';
+        form.querySelector('[name="transfer_type"]').value = event.transfer_type || '';
+        form.querySelector('[name="active_duration"]').value = event.active_duration || '';
+        form.querySelector('[name="itinerary_dispatch"]').value = event.itinerary_dispatch || '';
+        form.querySelector('[name="image"]').value = event.image || '';
         form.querySelector('[name="description"]').value = event.description || '';
 
-        document.getElementById('eventId').value = event.id; // Always store ID for updates
+        // Load itinerary phases
+        clearItineraryRows();
+        const phases = Array.isArray(event.itinerary) ? event.itinerary : (typeof event.itinerary === 'string' ? JSON.parse(event.itinerary || '[]') : []);
+        phases.forEach(p => addItineraryRow(p));
+
+        document.getElementById('eventId').value = event.id;
         document.getElementById('modalTitle').textContent = 'Edit Event';
         document.getElementById('submitBtn').textContent = 'Update Event';
 
@@ -441,14 +517,20 @@ async function handleAdminAddEvent(e) {
 
         if (!imageUrl) throw new Error('Experience image is required');
 
+        const itineraryPhases = getItineraryFormData();
+
         const eventData = {
             title: formData.get('title'),
             category: formData.get('category'),
             date: formData.get('date'),
             location: formData.get('location'),
-            duration: formData.get('duration'),
-            equipment: formData.get('equipment'),
-            difficulty: formData.get('difficulty'),
+            event_date: formData.get('event_date') || null,
+            capacity: formData.get('capacity') ? parseInt(formData.get('capacity')) : null,
+            departure_point: formData.get('departure_point'),
+            transfer_type: formData.get('transfer_type'),
+            active_duration: formData.get('active_duration'),
+            itinerary_dispatch: formData.get('itinerary_dispatch'),
+            itinerary: itineraryPhases,
             image: imageUrl,
             description: formData.get('description'),
             slug: formData.get('title').toLowerCase().replace(/\s+/g, '-')

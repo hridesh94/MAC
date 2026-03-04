@@ -36,10 +36,11 @@ async function checkAuthStatus() {
                 sessionStorage.setItem('userEmail', session.user.email);
                 sessionStorage.setItem('userRole', profile.role);
 
+                const currentPage = window.location.pathname.split('/').pop();
                 if (profile.role === 'admin') {
-                    showAdminDashboard();
+                    if (currentPage !== 'admin.html') window.location.href = 'admin.html';
                 } else {
-                    showMemberDashboard();
+                    if (currentPage !== 'member.html') window.location.href = 'member.html';
                 }
             }
         }
@@ -242,9 +243,9 @@ async function handleLogin(event) {
         closeLoginModal();
 
         if (profile.role === 'admin') {
-            showAdminDashboard();
+            window.location.href = 'admin.html';
         } else {
-            showMemberDashboard();
+            window.location.href = 'member.html';
         }
 
     } catch (err) {
@@ -258,11 +259,16 @@ async function handleLogin(event) {
 
 // Handle logout
 async function handleLogout() {
-    await supabase.auth.signOut();
+    try {
+        const supabase = await window.waitForSupabase();
+        await supabase.auth.signOut();
+    } catch (e) {
+        console.warn('Logout error:', e.message);
+    }
 
     // Clear session
     sessionStorage.clear();
 
-    // Reset UI
-    location.reload(); // Simplest way to reset the SPA state
+    // Redirect to landing page
+    window.location.href = 'index.html';
 }

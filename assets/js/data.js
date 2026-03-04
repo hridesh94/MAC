@@ -9,7 +9,7 @@ async function initializeData() {
 
         const { data: events, error } = await supabase
             .from('events')
-            .select('*');
+            .select('*, registrations(count)');
 
         if (error) throw error;
 
@@ -20,9 +20,18 @@ async function initializeData() {
                     slug: event.slug,
                     title: event.title,
                     date: event.date,
+                    eventDate: event.event_date || '',
+                    capacity: event.capacity || 20,
+                    registered: event.registrations?.[0]?.count ?? 0,
                     image: event.image || 'https://via.placeholder.com/800x600',
                     category: event.category || 'Experience',
                     longDescription: event.description || '',
+                    // Itinerary fields
+                    departurePoint: event.departure_point || '',
+                    transferType: event.transfer_type || '',
+                    activeDuration: event.active_duration || '',
+                    itineraryDispatch: event.itinerary_dispatch || '',
+                    itinerary: event.itinerary || null,
                     specs: {
                         location: event.location,
                         duration: event.duration || 'TBD',
