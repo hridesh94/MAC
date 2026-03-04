@@ -180,22 +180,22 @@ function buildItinerarySection(experience) {
             </div>
             
             <div class="relative max-w-7xl mx-auto pb-20" id="timelineContainer-${experience.slug}">
-                <div class="absolute left-8 md:left-8 top-0 bottom-0 w-[2px] bg-[linear-gradient(to_bottom,var(--tw-gradient-stops))] from-transparent from-[0%] via-white/10 to-transparent to-[99%] [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]"></div>
-                <div id="timelineProgress-${experience.slug}" class="absolute left-8 md:left-8 top-0 w-[2px] bg-gradient-to-b from-transparent via-primary to-transparent opacity-0 duration-200 [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)] transition-[height] ease-linear" style="height: 0%; opacity: 1;"></div>
+                <div class="absolute left-8 md:left-48 top-0 bottom-0 w-[2px] bg-[linear-gradient(to_bottom,var(--tw-gradient-stops))] from-transparent from-[0%] via-white/10 to-transparent to-[99%] [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]"></div>
+                <div id="timelineProgress-${experience.slug}" class="absolute left-8 md:left-48 top-0 w-[2px] bg-gradient-to-b from-transparent via-primary to-transparent opacity-0 duration-200 [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)] transition-[height] ease-linear" style="height: 0%; opacity: 1;"></div>
                 
                 ${phases.map((p, i) => `
                 <div class="flex justify-start pt-10 md:pt-40 md:gap-10 timeline-item">
-                    <div class="sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
-                        <div class="h-10 absolute left-8 md:left-8 w-10 rounded-full bg-[#120b0c] flex items-center justify-center -translate-x-1/2">
+                    <div class="sticky flex flex-col md:flex-row z-40 items-center top-40 self-start w-32 md:w-48 flex-shrink-0">
+                        <div class="h-10 absolute left-8 md:left-48 w-10 rounded-full bg-[#120b0c] flex items-center justify-center -translate-x-1/2">
                             <div class="h-3 w-3 rounded-full ${p.key ? 'bg-primary border border-primary/50 shadow-[0_0_12px_rgba(212,17,50,0.6)] always-active' : 'bg-white/10 border border-white/20 transition-all duration-300'} timeline-dot"></div>
                         </div>
-                        <h3 class="hidden md:block text-xl md:pl-20 md:text-5xl font-serif italic font-light text-white/80">
+                        <h3 class="hidden md:block text-xl md:pl-8 md:text-5xl font-serif italic font-light text-white/80 pr-4 w-full">
                             ${p.time.split(' — ')[0] || p.time}<br/>
                             <span class="text-sm md:text-2xl font-sans not-italic text-white/40 block mt-2">${p.time.split(' — ')[1] || ''}</span>
                         </h3>
                     </div>
 
-                    <div class="relative pl-20 pr-4 md:pl-4 w-full">
+                    <div class="relative pl-16 pr-4 md:pl-20 w-full">
                         <h3 class="md:hidden block text-2xl mb-4 text-left font-serif italic text-white/80">
                             ${p.time}
                         </h3>
