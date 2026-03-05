@@ -4,7 +4,7 @@
     "description": "MAC - The Limitless Club",
     "private": true,
     "dependencies": {
-        "@supabase/supabase-js": "^2.39.0"
+        "@supabase/supabase-js": "^2.98.0"
     },
     "devDependencies": {
         "wrangler": "^3.101.0"
