@@ -357,6 +357,18 @@ async function confirmDangerAction() {
     }
 }
 
+// Helper: get Supabase Edge Function URL and auth headers
+async function getEdgeFunctionConfig() {
+    const SUPABASE_URL = 'https://azmfbhffgqqeqbxmkdqf.supabase.co';
+    const { data: { session } } = await supabase.auth.getSession();
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token || ''}`,
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6bWZiaGZmZ3FxZXFieG1rZHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NTc1NjksImV4cCI6MjA4NjIzMzU2OX0.74VBnyYMCfgOH5IQvj1c1-O2GCQTG6ul5bXRgTizJWU'
+    };
+    return { SUPABASE_URL, headers };
+}
+
 // Delete Member (Revoke Access) - Uses Danger Modal
 function deleteMember(userId) {
     openDangerModal(
@@ -364,9 +376,10 @@ function deleteMember(userId) {
         "This will permanently delete the member's profile and data.",
         'Revoke',
         async () => {
-            const response = await fetch('/api/delete-member', {
+            const { SUPABASE_URL, headers } = await getEdgeFunctionConfig();
+            const response = await fetch(`${SUPABASE_URL}/functions/v1/delete-member`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: JSON.stringify({ userId })
             });
 
@@ -376,7 +389,7 @@ function deleteMember(userId) {
                 try {
                     result = JSON.parse(text);
                 } catch (e) {
-                    throw new Error(`Server returned ${response.status} ${response.statusText}. Please try again or contact support.`);
+                    throw new Error(`Server returned ${response.status}. Please try again or contact support.`);
                 }
                 throw new Error(result.error || 'Failed to revoke access');
             }
@@ -623,9 +636,10 @@ async function confirmIssueCredential() {
     errorEl.classList.add('hidden');
 
     try {
-        const response = await fetch('/api/add-member', {
+        const { SUPABASE_URL, headers } = await getEdgeFunctionConfig();
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/add-member`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify({ email, password })
         });
 
@@ -636,12 +650,11 @@ async function confirmIssueCredential() {
             result = JSON.parse(text);
         } catch (e) {
             console.error('Invalid JSON response:', text);
-            throw new Error(`Server returned ${response.status} ${response.statusText}. Please try again or contact support.`);
+            throw new Error(`Server returned ${response.status}. Please try again or contact support.`);
         }
 
         if (response.ok) {
             closeIssueCredentialModal();
-            // Optional: nice success feedback
             renderAdminMembers();
             updateAdminStats();
         } else {

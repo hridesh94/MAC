@@ -50,6 +50,9 @@ async function fetchUserRegistrations() {
         // Extract slugs for easy lookup
         REGISTERED_EVENT_IDS = data.map(r => r.events.slug);
 
+        // Sync to sessionStorage so showExperience() can check registration state
+        sessionStorage.setItem('registeredEvents', JSON.stringify(REGISTERED_EVENT_IDS));
+
     } catch (err) {
         console.error('Error fetching registrations:', err.message);
     }
@@ -285,8 +288,63 @@ function triggerCancelParticipation(slug, title, date) {
 
 
 
-// Simple redirect or placeholder for calendar (simplified for now)
+// Download an ICS calendar file for a confirmed event
 function downloadCalendarDetail(slug) {
     const event = EXPERIENCE_DATA[slug];
-    console.log(`Calendar invite for ${event.title} downloaded (Simulated).`);
+    if (!event) return;
+
+    // Build start/end date — use eventDate if available, else try to parse date text
+    const rawDate = event.eventDate || event.date || '';
+    let dtStart, dtEnd;
+    const parsed = new Date(rawDate);
+    if (!isNaN(parsed.getTime())) {
+        // Valid ISO date — use 9 AM as start, 6 PM as end (same day)
+        const pad = n => String(n).padStart(2, '0');
+        const fmt = (d) =>
+            `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T090000Z`;
+        dtStart = fmt(parsed);
+        dtEnd = `${parsed.getUTCFullYear()}${pad(parsed.getUTCMonth() + 1)}${pad(parsed.getUTCDate())}T180000Z`;
+    } else {
+        // No parseable date — use a placeholder
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        dtStart = `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T090000Z`;
+        dtEnd = `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T180000Z`;
+    }
+
+    const location = event.specs?.location || event.departurePoint || '';
+    const description = (event.longDescription || event.description || '').replace(/\n/g, '\\n');
+    const uid = `mac-${slug}-${Date.now()}@joinmac.app`;
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const stamp = `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
+
+    const ics = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//MAC - The Limitless Club//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART:${dtStart}`,
+        `DTEND:${dtEnd}`,
+        `SUMMARY:MAC — ${event.title}`,
+        `LOCATION:${location}`,
+        `DESCRIPTION:${description}`,
+        'STATUS:CONFIRMED',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `MAC-${event.title.replace(/\s+/g, '-')}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
