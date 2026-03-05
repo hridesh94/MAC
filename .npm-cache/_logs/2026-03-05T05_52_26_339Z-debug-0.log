@@ -1,0 +1,78 @@
+0 verbose cli /opt/homebrew/Cellar/node/24.2.0/bin/node /opt/homebrew/bin/npm
+1 info using npm@11.3.0
+2 info using node@v24.2.0
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/hridesh/Web/MAC/playwright_tests/.npmrc
+5 silly config load:file:/Users/hridesh/.npmrc
+6 silly config load:file:/opt/homebrew/etc/npmrc
+7 verbose title npm install @playwright/test
+8 verbose argv "install" "--save-dev" "@playwright/test" "--cache" "../.npm-cache"
+9 verbose logfile logs-max:10 dir:/Users/hridesh/Web/MAC/.npm-cache/_logs/2026-03-05T05_52_26_339Z-
+10 verbose logfile /Users/hridesh/Web/MAC/.npm-cache/_logs/2026-03-05T05_52_26_339Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly idealTree buildDeps
+14 silly fetch manifest @playwright/test@*
+15 silly packumentCache full:https://registry.npmjs.org/@playwright%2ftest cache-miss
+16 http cache https://registry.npmjs.org/@playwright%2ftest 10ms (cache hit)
+17 silly packumentCache full:https://registry.npmjs.org/@playwright%2ftest set size:8817645 disposed:false
+18 silly placeDep ROOT @playwright/test@1.58.2 OK for: playwright_tests@1.0.0 want: *
+19 silly fetch manifest playwright@1.58.2
+20 silly packumentCache full:https://registry.npmjs.org/playwright cache-miss
+21 http cache https://registry.npmjs.org/playwright 12ms (cache hit)
+22 silly packumentCache full:https://registry.npmjs.org/playwright set size:15801892 disposed:false
+23 silly placeDep ROOT playwright@1.58.2 OK for: @playwright/test@1.58.2 want: 1.58.2
+24 silly fetch manifest playwright-core@1.58.2
+25 silly packumentCache full:https://registry.npmjs.org/playwright-core cache-miss
+26 silly fetch manifest fsevents@2.3.2
+27 silly packumentCache full:https://registry.npmjs.org/fsevents cache-miss
+28 http cache https://registry.npmjs.org/fsevents 2ms (cache hit)
+29 silly packumentCache full:https://registry.npmjs.org/fsevents set size:182472 disposed:false
+30 http cache https://registry.npmjs.org/playwright-core 15ms (cache hit)
+31 silly packumentCache full:https://registry.npmjs.org/playwright-core set size:17640151 disposed:false
+32 silly placeDep ROOT fsevents@2.3.2 OK for: playwright@1.58.2 want: 2.3.2
+33 silly placeDep ROOT playwright-core@1.58.2 OK for: playwright@1.58.2 want: 1.58.2
+34 silly reify moves {}
+35 verbose stack Error: EPERM: operation not permitted, mkdir '/Users/hridesh/Web/MAC/playwright_tests/node_modules/@playwright'
+35 verbose stack     at async mkdir (node:internal/fs/promises:859:10)
+35 verbose stack     at async /opt/homebrew/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:638:20
+35 verbose stack     at async Promise.allSettled (index 0)
+35 verbose stack     at async [reifyPackages] (/opt/homebrew/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:336:11)
+35 verbose stack     at async Arborist.reify (/opt/homebrew/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:141:5)
+35 verbose stack     at async Install.exec (/opt/homebrew/lib/node_modules/npm/lib/commands/install.js:149:5)
+35 verbose stack     at async Npm.exec (/opt/homebrew/lib/node_modules/npm/lib/npm.js:208:9)
+35 verbose stack     at async module.exports (/opt/homebrew/lib/node_modules/npm/lib/cli/entry.js:67:5)
+36 error code EPERM
+37 error syscall mkdir
+38 error path /Users/hridesh/Web/MAC/playwright_tests/node_modules/@playwright
+39 error errno -1
+40 error Error: EPERM: operation not permitted, mkdir '/Users/hridesh/Web/MAC/playwright_tests/node_modules/@playwright'
+40 error     at async mkdir (node:internal/fs/promises:859:10)
+40 error     at async /opt/homebrew/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:638:20
+40 error     at async Promise.allSettled (index 0)
+40 error     at async [reifyPackages] (/opt/homebrew/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:336:11)
+40 error     at async Arborist.reify (/opt/homebrew/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:141:5)
+40 error     at async Install.exec (/opt/homebrew/lib/node_modules/npm/lib/commands/install.js:149:5)
+40 error     at async Npm.exec (/opt/homebrew/lib/node_modules/npm/lib/npm.js:208:9)
+40 error     at async module.exports (/opt/homebrew/lib/node_modules/npm/lib/cli/entry.js:67:5) {
+40 error   errno: -1,
+40 error   code: 'EPERM',
+40 error   syscall: 'mkdir',
+40 error   path: '/Users/hridesh/Web/MAC/playwright_tests/node_modules/@playwright'
+40 error }
+41 error
+41 error The operation was rejected by your operating system.
+41 error It is likely you do not have the permissions to access this file as the current user
+41 error
+41 error If you believe this might be a permissions issue, please double-check the
+41 error permissions of the file and its containing directories, or try running
+41 error the command again as root/Administrator.
+42 silly unfinished npm timer reify 1772689946413
+43 silly unfinished npm timer reify:createSparse 1772689946554
+44 verbose cwd /Users/hridesh/Web/MAC/playwright_tests
+45 verbose os Darwin 25.3.0
+46 verbose node v24.2.0
+47 verbose npm  v11.3.0
+48 verbose exit -1
+49 verbose code -1
+50 error A complete log of this run can be found in: /Users/hridesh/Web/MAC/.npm-cache/_logs/2026-03-05T05_52_26_339Z-debug-0.log

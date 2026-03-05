@@ -1,0 +1,147 @@
+0 verbose cli /opt/homebrew/Cellar/node/24.2.0/bin/node /opt/homebrew/bin/npm
+1 info using npm@11.3.0
+2 info using node@v24.2.0
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/hridesh/Web/MAC/.npmrc
+5 silly config load:file:/Users/hridesh/.npmrc
+6 silly config load:file:/opt/homebrew/etc/npmrc
+7 verbose title npm i
+8 verbose argv "i" "--package-lock-only" "--cache" "./.npm-cache"
+9 verbose logfile logs-max:10 dir:/Users/hridesh/Web/MAC/.npm-cache/_logs/2026-03-05T06_52_14_836Z-
+10 verbose logfile /Users/hridesh/Web/MAC/.npm-cache/_logs/2026-03-05T06_52_14_836Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 verbose shrinkwrap failed to load /Users/hridesh/Web/MAC EPERM: operation not permitted, open '/Users/hridesh/Web/MAC/node_modules/.package-lock.json'
+14 silly idealTree buildDeps
+15 silly fetch manifest @supabase/supabase-js@^2.98.0
+16 silly packumentCache full:https://registry.npmjs.org/@supabase%2fsupabase-js cache-miss
+17 http fetch GET 200 https://registry.npmjs.org/@supabase%2fsupabase-js 375ms (cache miss)
+18 silly packumentCache full:https://registry.npmjs.org/@supabase%2fsupabase-js set size:undefined disposed:false
+19 silly placeDep ROOT @supabase/supabase-js@2.98.0 OK for: mac-website@1.0.0 want: ^2.98.0
+20 silly fetch manifest @supabase/auth-js@2.98.0
+21 silly packumentCache full:https://registry.npmjs.org/@supabase%2fauth-js cache-miss
+22 silly fetch manifest @supabase/storage-js@2.98.0
+23 silly packumentCache full:https://registry.npmjs.org/@supabase%2fstorage-js cache-miss
+24 silly fetch manifest @supabase/realtime-js@2.98.0
+25 silly packumentCache full:https://registry.npmjs.org/@supabase%2frealtime-js cache-miss
+26 silly fetch manifest @supabase/functions-js@2.98.0
+27 silly packumentCache full:https://registry.npmjs.org/@supabase%2ffunctions-js cache-miss
+28 silly fetch manifest @supabase/postgrest-js@2.98.0
+29 silly packumentCache full:https://registry.npmjs.org/@supabase%2fpostgrest-js cache-miss
+30 http fetch GET 200 https://registry.npmjs.org/@supabase%2fauth-js 959ms (cache miss)
+31 silly packumentCache full:https://registry.npmjs.org/@supabase%2fauth-js set size:undefined disposed:false
+32 http fetch GET 200 https://registry.npmjs.org/@supabase%2frealtime-js 983ms (cache miss)
+33 silly packumentCache full:https://registry.npmjs.org/@supabase%2frealtime-js set size:undefined disposed:false
+34 http fetch GET 200 https://registry.npmjs.org/@supabase%2fpostgrest-js 2092ms (cache miss)
+35 silly packumentCache full:https://registry.npmjs.org/@supabase%2fpostgrest-js set size:undefined disposed:false
+36 http fetch GET 200 https://registry.npmjs.org/@supabase%2ffunctions-js 2184ms (cache miss)
+37 silly packumentCache full:https://registry.npmjs.org/@supabase%2ffunctions-js set size:undefined disposed:false
+38 http fetch GET 200 https://registry.npmjs.org/@supabase%2fstorage-js 2240ms (cache miss)
+39 silly packumentCache full:https://registry.npmjs.org/@supabase%2fstorage-js set size:undefined disposed:false
+40 silly placeDep ROOT @supabase/auth-js@2.98.0 OK for: @supabase/supabase-js@2.98.0 want: 2.98.0
+41 silly placeDep ROOT @supabase/functions-js@2.98.0 OK for: @supabase/supabase-js@2.98.0 want: 2.98.0
+42 silly placeDep ROOT @supabase/postgrest-js@2.98.0 OK for: @supabase/supabase-js@2.98.0 want: 2.98.0
+43 silly placeDep ROOT @supabase/realtime-js@2.98.0 OK for: @supabase/supabase-js@2.98.0 want: 2.98.0
+44 silly placeDep ROOT @supabase/storage-js@2.98.0 OK for: @supabase/supabase-js@2.98.0 want: 2.98.0
+45 silly fetch manifest tslib@2.8.1
+46 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+47 silly fetch manifest tslib@2.8.1
+48 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+49 silly fetch manifest tslib@2.8.1
+50 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+51 silly fetch manifest ws@^8.18.2
+52 silly packumentCache full:https://registry.npmjs.org/ws cache-miss
+53 silly fetch manifest tslib@2.8.1
+54 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+55 silly fetch manifest @types/ws@^8.18.1
+56 silly packumentCache full:https://registry.npmjs.org/@types%2fws cache-miss
+57 silly fetch manifest @types/phoenix@^1.6.6
+58 silly packumentCache full:https://registry.npmjs.org/@types%2fphoenix cache-miss
+59 silly fetch manifest tslib@2.8.1
+60 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+61 silly fetch manifest iceberg-js@^0.8.1
+62 silly packumentCache full:https://registry.npmjs.org/iceberg-js cache-miss
+63 http fetch GET 200 https://registry.npmjs.org/tslib 344ms (cache miss)
+64 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+65 http fetch GET 200 https://registry.npmjs.org/tslib 345ms (cache miss)
+66 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+67 http fetch GET 200 https://registry.npmjs.org/tslib 346ms (cache miss)
+68 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+69 http fetch GET 200 https://registry.npmjs.org/tslib 348ms (cache miss)
+70 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+71 http fetch GET 200 https://registry.npmjs.org/tslib 348ms (cache miss)
+72 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+73 http fetch GET 200 https://registry.npmjs.org/ws 364ms (cache miss)
+74 silly packumentCache full:https://registry.npmjs.org/ws set size:undefined disposed:false
+75 http fetch GET 200 https://registry.npmjs.org/iceberg-js 508ms (cache miss)
+76 silly packumentCache full:https://registry.npmjs.org/iceberg-js set size:undefined disposed:false
+77 http fetch GET 200 https://registry.npmjs.org/@types%2fws 1012ms (cache miss)
+78 silly packumentCache full:https://registry.npmjs.org/@types%2fws set size:undefined disposed:false
+79 http fetch GET 200 https://registry.npmjs.org/@types%2fphoenix 1041ms (cache miss)
+80 silly packumentCache full:https://registry.npmjs.org/@types%2fphoenix set size:undefined disposed:false
+81 silly placeDep ROOT tslib@2.8.1 OK for: @supabase/auth-js@2.98.0 want: 2.8.1
+82 silly fetch manifest bufferutil@^4.0.1
+83 silly packumentCache full:https://registry.npmjs.org/bufferutil cache-miss
+84 http fetch GET 200 https://registry.npmjs.org/bufferutil 42ms (cache miss)
+85 silly packumentCache full:https://registry.npmjs.org/bufferutil set size:undefined disposed:false
+86 silly fetch manifest utf-8-validate@>=5.0.2
+87 silly packumentCache full:https://registry.npmjs.org/utf-8-validate cache-miss
+88 http fetch GET 200 https://registry.npmjs.org/utf-8-validate 38ms (cache miss)
+89 silly packumentCache full:https://registry.npmjs.org/utf-8-validate set size:undefined disposed:false
+90 silly placeDep ROOT @types/phoenix@1.6.7 OK for: @supabase/realtime-js@2.98.0 want: ^1.6.6
+91 silly placeDep ROOT @types/ws@8.18.1 OK for: @supabase/realtime-js@2.98.0 want: ^8.18.1
+92 silly placeDep ROOT ws@8.19.0 OK for: @supabase/realtime-js@2.98.0 want: ^8.18.2
+93 silly fetch manifest @types/node@*
+94 silly packumentCache full:https://registry.npmjs.org/@types%2fnode cache-miss
+95 http fetch GET 200 https://registry.npmjs.org/@types%2fnode 239ms (cache miss)
+96 silly packumentCache full:https://registry.npmjs.org/@types%2fnode set size:undefined disposed:false
+97 silly placeDep ROOT iceberg-js@0.8.1 OK for: @supabase/storage-js@2.98.0 want: ^0.8.1
+98 silly placeDep ROOT @types/node@25.3.3 OK for: @types/ws@8.18.1 want: *
+99 silly fetch manifest undici-types@~7.18.0
+100 silly packumentCache full:https://registry.npmjs.org/undici-types cache-miss
+101 http fetch GET 200 https://registry.npmjs.org/undici-types 49ms (cache miss)
+102 silly packumentCache full:https://registry.npmjs.org/undici-types set size:undefined disposed:false
+103 silly placeDep ROOT undici-types@7.18.2 OK for: @types/node@25.3.3 want: ~7.18.0
+104 silly audit bulk request {
+104 silly audit   '@supabase/supabase-js': [ '2.98.0' ],
+104 silly audit   '@supabase/auth-js': [ '2.98.0' ],
+104 silly audit   '@supabase/functions-js': [ '2.98.0' ],
+104 silly audit   '@supabase/postgrest-js': [ '2.98.0' ],
+104 silly audit   '@supabase/realtime-js': [ '2.98.0' ],
+104 silly audit   '@supabase/storage-js': [ '2.98.0' ],
+104 silly audit   tslib: [ '2.8.1' ],
+104 silly audit   '@types/phoenix': [ '1.6.7' ],
+104 silly audit   '@types/ws': [ '8.18.1' ],
+104 silly audit   ws: [ '8.19.0' ],
+104 silly audit   'iceberg-js': [ '0.8.1' ],
+104 silly audit   '@types/node': [ '25.3.3' ],
+104 silly audit   'undici-types': [ '7.18.2' ]
+104 silly audit }
+105 verbose stack Error: EPERM: operation not permitted, lstat '/Users/hridesh/Web/MAC/node_modules/.package-lock.json'
+106 error code EPERM
+107 error syscall lstat
+108 error path /Users/hridesh/Web/MAC/node_modules/.package-lock.json
+109 error errno -1
+110 error [Error: EPERM: operation not permitted, lstat '/Users/hridesh/Web/MAC/node_modules/.package-lock.json'] {
+110 error   errno: -1,
+110 error   code: 'EPERM',
+110 error   syscall: 'lstat',
+110 error   path: '/Users/hridesh/Web/MAC/node_modules/.package-lock.json'
+110 error }
+111 error
+111 error The operation was rejected by your operating system.
+111 error It is likely you do not have the permissions to access this file as the current user
+111 error
+111 error If you believe this might be a permissions issue, please double-check the
+111 error permissions of the file and its containing directories, or try running
+111 error the command again as root/Administrator.
+112 silly unfinished npm timer reify 1772693534920
+113 silly unfinished npm timer reify:audit 1772693539021
+114 silly unfinished npm timer auditReport:getReport 1772693539021
+115 verbose cwd /Users/hridesh/Web/MAC
+116 verbose os Darwin 25.3.0
+117 verbose node v24.2.0
+118 verbose npm  v11.3.0
+119 verbose exit -1
+120 verbose code -1
+121 error A complete log of this run can be found in: /Users/hridesh/Web/MAC/.npm-cache/_logs/2026-03-05T06_52_14_836Z-debug-0.log
