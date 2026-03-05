@@ -376,7 +376,7 @@ function deleteMember(userId) {
                 try {
                     result = JSON.parse(text);
                 } catch (e) {
-                    throw new Error(`Server returned ${response.status} ${response.statusText}. Ensure Cloudflare Functions are running.`);
+                    throw new Error(`Server returned ${response.status} ${response.statusText}. Please try again or contact support.`);
                 }
                 throw new Error(result.error || 'Failed to revoke access');
             }
@@ -636,7 +636,7 @@ async function confirmIssueCredential() {
             result = JSON.parse(text);
         } catch (e) {
             console.error('Invalid JSON response:', text);
-            throw new Error(`Server returned ${response.status} ${response.statusText}. Ensure Cloudflare Functions are running.`);
+            throw new Error(`Server returned ${response.status} ${response.statusText}. Please try again or contact support.`);
         }
 
         if (response.ok) {
