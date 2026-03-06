@@ -332,19 +332,26 @@ function showExperience(slug) {
                                         Edit Event Details
                                     </button>`;
             } else if (previousViewId === 'membersDashboard') {
-                // Member view - show participation button
-                const registeredEvents = JSON.parse(sessionStorage.getItem('registeredEvents') || '[]');
-                if (registeredEvents.includes(experience.slug)) {
-                    return `<button class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-white/10 border border-white/20 text-white/50 text-sm font-black uppercase tracking-widest cursor-not-allowed">
+                // Member view - show 3-state participation button
+                const regStatus = (typeof getRegistrationStatus === 'function')
+                    ? getRegistrationStatus(experience.slug)
+                    : null;
+
+                if (regStatus === 'confirmed') {
+                    return `<button id="detailParticipationBtn" data-reg-btn="${experience.slug}" data-slug="${experience.slug}" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-white/10 border border-white/20 text-white/50 text-sm font-black uppercase tracking-widest cursor-not-allowed" disabled>
                                             Already Registered
                                         </button>`;
+                } else if (regStatus === 'pending_payment') {
+                    return `<button id="detailParticipationBtn" data-reg-btn="${experience.slug}" data-slug="${experience.slug}" onclick="window.location.href='https://buy.stripe.com/test_bJebJ131T3TW2uF8Wc9Ve00'" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-amber-500 text-black text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/30">
+                                            Complete Payment
+                                        </button>`;
                 }
-                return `<button onclick="openParticipationModal('${experience.slug}', '${experience.title}', '${experience.date}')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
+                return `<button id="detailParticipationBtn" data-reg-btn="${experience.slug}" data-slug="${experience.slug}" onclick="event.stopPropagation(); openParticipationModal('${experience.slug}', '${experience.title}', '${experience.date}')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-white text-sm font-black uppercase tracking-widest transition-all hover-scale hover:shadow-2xl hover:shadow-primary/20">
                                         Secure Participation
                                     </button>`;
             } else {
                 // Public view - prompt to login
-                return `<button onclick="navigateTo('login')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/30">
+                return `<button onclick="event.stopPropagation(); navigateTo('login')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-white text-sm font-black uppercase tracking-widest transition-all hover-scale hover:shadow-2xl hover:shadow-primary/20">
                                         Secure Participation
                                     </button>`;
             }

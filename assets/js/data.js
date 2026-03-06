@@ -57,7 +57,4 @@ async function initializeData() {
 }
 
 // Call initialization
-initializeData();
-
-// Call initialization
-initializeData();
+window.dataInitialized = initializeData();

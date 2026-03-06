@@ -40,7 +40,11 @@ async function checkAuthStatus() {
                 if (profile.role === 'admin') {
                     if (currentPage !== 'admin.html') window.location.href = 'admin.html';
                 } else {
-                    if (currentPage !== 'member.html') window.location.href = 'member.html';
+                    if (currentPage !== 'member.html') {
+                        // Preserve ?success=true and other params across redirect
+                        const params = window.location.search;
+                        window.location.href = 'member.html' + params;
+                    }
                 }
             }
         }

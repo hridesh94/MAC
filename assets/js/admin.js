@@ -159,6 +159,7 @@ async function initializeAdminData() {
     await updateAdminStats();
     await renderAdminEvents();
     await renderAdminMembers();
+    await renderAdminRegistrations();
     await renderAccessRequests();
 }
 
@@ -216,13 +217,83 @@ async function updateAdminStats() {
     try {
         const { count: eventCount } = await supabase.from('events').select('*', { count: 'exact', head: true });
         const { count: memberCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
-        const { count: regCount } = await supabase.from('registrations').select('*', { count: 'exact', head: true });
+        const { count: confirmedCount } = await supabase.from('registrations').select('*', { count: 'exact', head: true }).eq('status', 'confirmed');
 
         document.getElementById('adminTotalEvents').textContent = eventCount || 0;
         document.getElementById('adminTotalMembers').textContent = memberCount || 0;
-        document.getElementById('adminTotalRegistrations').textContent = regCount || 0;
+        document.getElementById('adminTotalRegistrations').textContent = confirmedCount || 0;
     } catch (err) {
         console.error('Error updating stats:', err.message);
+    }
+}
+
+// Render admin registrations table (pending + confirmed)
+async function renderAdminRegistrations() {
+    try {
+        const { data, error } = await supabase
+            .from('registrations')
+            .select('id, status, created_at, events(title, slug), profiles(email)')
+            .neq('status', 'cancelled')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const tbody = document.getElementById('adminRegistrationsTable');
+        if (!tbody) return;
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-white/50">No registrations found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(reg => {
+            const statusBadge = reg.status === 'confirmed'
+                ? `<span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest border border-primary/20">Confirmed</span>`
+                : `<span class="px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full text-xs font-bold uppercase tracking-widest border border-amber-500/20">Pending Payment</span>`;
+
+            return `
+            <tr class="hover:bg-white/5 transition-colors">
+                <td class="p-6">
+                    <div class="font-bold text-sm">${reg.profiles?.email || '—'}</div>
+                </td>
+                <td class="p-6">
+                    <div class="text-sm">${reg.events?.title || '—'}</div>
+                    <div class="text-xs opacity-40 uppercase tracking-widest">${reg.events?.slug || ''}</div>
+                </td>
+                <td class="p-6">${statusBadge}</td>
+                <td class="p-6">
+                    <div class="text-xs opacity-60">${new Date(reg.created_at).toLocaleDateString()}</div>
+                </td>
+                <td class="p-6 text-right">
+                    ${reg.status === 'pending_payment'
+                    ? `<button onclick="confirmRegistration('${reg.id}')" class="text-amber-500 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">Confirm</button>`
+                    : '<span class="text-white/20 text-xs">—</span>'}
+                </td>
+            </tr>
+        `;
+        }).join('');
+    } catch (err) {
+        console.error('Error rendering registrations:', err.message);
+    }
+}
+
+// Confirm Registration Manually
+async function confirmRegistration(regId) {
+    if (!confirm('Are you sure you want to mark this payment as confirmed?')) return;
+
+    try {
+        const { error } = await supabase
+            .from('registrations')
+            .update({ status: 'confirmed' })
+            .eq('id', regId);
+
+        if (error) throw error;
+
+        // Refresh UI
+        await initializeAdminData();
+    } catch (err) {
+        console.error('Error confirming registration:', err.message);
+        alert('Error: ' + err.message);
     }
 }
 
