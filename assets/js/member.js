@@ -396,9 +396,18 @@ function renderMyEvents() {
 
 // ─── Dashboard stats ──────────────────────────────────────────────────────────
 function updateDashboardStats() {
-    const confirmed = Object.values(REGISTRATION_CACHE).filter(r => r.status === 'confirmed').length;
-    const el = document.getElementById('registeredCount');
-    if (el) el.textContent = confirmed;
+    const totalEvents = Object.keys(EXPERIENCE_DATA).length;
+    const registered = Object.values(REGISTRATION_CACHE).filter(r => r.status === 'confirmed' || r.status === 'pending_payment').length;
+
+    // Registered count (confirmed only)
+    const confirmedCount = Object.values(REGISTRATION_CACHE).filter(r => r.status === 'confirmed').length;
+    const regEl = document.getElementById('registeredCount');
+    if (regEl) regEl.textContent = confirmedCount;
+
+    // Available count (Total - (Confirmed or Pending))
+    const availableCount = Math.max(0, totalEvents - registered);
+    const availEl = document.getElementById('availableCount');
+    if (availEl) availEl.textContent = availableCount;
 }
 
 // ─── Open participation modal ─────────────────────────────────────────────────
