@@ -250,9 +250,18 @@ function applyButtonState(btn, slug, status) {
         const ev = EXPERIENCE_DATA[slug];
         const title = ev?.title || slug;
         const date = ev?.date || '';
-        btn.textContent = 'Secure Participation';
-        btn.className = 'flex items-center justify-center rounded-full h-12 px-8 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale';
-        btn.onclick = (e) => { e.stopPropagation(); openParticipationModal(slug, title, date); };
+        const isActive = ev?.is_active ?? true;
+
+        if (!isActive) {
+            btn.textContent = 'Registration TBD';
+            btn.className = 'flex items-center justify-center rounded-full h-12 px-8 bg-white/10 text-white/40 text-sm font-bold uppercase tracking-widest cursor-not-allowed';
+            btn.onclick = null;
+            btn.disabled = true;
+        } else {
+            btn.textContent = 'Secure Participation';
+            btn.className = 'flex items-center justify-center rounded-full h-12 px-8 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale';
+            btn.onclick = (e) => { e.stopPropagation(); openParticipationModal(slug, title, date); };
+        }
     }
 }
 
@@ -275,7 +284,17 @@ function renderAvailableEvents() {
     const grid = document.getElementById('availableEventsGrid');
     if (!grid) return;
 
-    const events = Object.values(EXPERIENCE_DATA);
+    const events = Object.values(EXPERIENCE_DATA).sort((a, b) => {
+        const getPriority = (ev) => {
+            if (ev.is_active === false) return 3;
+            const status = getRegistrationStatus(ev.slug);
+            if (!status) return 0;
+            if (status === 'pending_payment') return 1;
+            if (status === 'confirmed') return 2;
+            return 4;
+        };
+        return getPriority(a) - getPriority(b);
+    });
 
     grid.innerHTML = events.map((event, index) => {
         const status = getRegistrationStatus(event.slug);
@@ -287,7 +306,11 @@ function renderAvailableEvents() {
         } else if (status === 'pending_payment') {
             btnHtml = `<button data-reg-btn="${event.slug}" onclick="event.stopPropagation(); triggerCheckout('${event.slug}')" class="flex items-center justify-center rounded-full h-12 px-8 bg-amber-500 text-black text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-amber-500/30 transition-all hover-scale">Complete Payment</button>`;
         } else {
-            btnHtml = `<button data-reg-btn="${event.slug}" onclick="event.stopPropagation(); openParticipationModal('${event.slug}', '${event.title}', '${event.date}')" class="flex items-center justify-center rounded-full h-12 px-8 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">Secure Participation</button>`;
+            if (event.is_active === false) {
+                btnHtml = `<button data-reg-btn="${event.slug}" class="flex items-center justify-center rounded-full h-12 px-8 bg-white/10 text-white/40 text-sm font-bold uppercase tracking-widest cursor-not-allowed" disabled>Registration TBD</button>`;
+            } else {
+                btnHtml = `<button data-reg-btn="${event.slug}" onclick="event.stopPropagation(); openParticipationModal('${event.slug}', '${event.title}', '${event.date}')" class="flex items-center justify-center rounded-full h-12 px-8 bg-primary text-white text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/20 transition-all hover-scale">Secure Participation</button>`;
+            }
         }
 
         let badgeHtml;
@@ -396,7 +419,7 @@ function renderMyEvents() {
 
 // ─── Dashboard stats ──────────────────────────────────────────────────────────
 function updateDashboardStats() {
-    const totalEvents = Object.keys(EXPERIENCE_DATA).length;
+    const totalActiveEvents = Object.values(EXPERIENCE_DATA).filter(e => e.is_active !== false).length;
     const registered = Object.values(REGISTRATION_CACHE).filter(r => r.status === 'confirmed' || r.status === 'pending_payment').length;
 
     // Registered count (confirmed only)
@@ -404,8 +427,8 @@ function updateDashboardStats() {
     const regEl = document.getElementById('registeredCount');
     if (regEl) regEl.textContent = confirmedCount;
 
-    // Available count (Total - (Confirmed or Pending))
-    const availableCount = Math.max(0, totalEvents - registered);
+    // Available count (Total Active - (Confirmed or Pending))
+    const availableCount = Math.max(0, totalActiveEvents - registered);
     const availEl = document.getElementById('availableCount');
     if (availEl) availEl.textContent = availableCount;
 }

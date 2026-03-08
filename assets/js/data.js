@@ -32,6 +32,7 @@ async function initializeData() {
                     activeDuration: event.active_duration || '',
                     itineraryDispatch: event.itinerary_dispatch || '',
                     itinerary: event.itinerary || null,
+                    is_active: event.is_active ?? true,
                     specs: {
                         location: event.location,
                         duration: event.duration || 'TBD',

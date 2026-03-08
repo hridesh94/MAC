@@ -362,8 +362,8 @@
                     </div>
                 </div>
 
-                <!-- Countdown + Capacity -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Countdown + Capacity + Active Status -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-2">
                         <label class="text-xs font-bold uppercase tracking-widest text-primary">Event Date <span
                                 class="text-white/30 normal-case font-normal">(for countdown timer)</span></label>
@@ -375,6 +375,16 @@
                                 class="text-white/30 normal-case font-normal">(spots)</span></label>
                         <input type="number" name="capacity" placeholder="e.g. 20" min="1"
                             class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    </div>
+                    <div class="space-y-4 flex flex-col justify-end pb-1">
+                        <label
+                            class="flex items-center gap-3 cursor-pointer group bg-white/5 border border-white/10 rounded-lg px-4 py-3 hover:border-amber-500 transition-colors">
+                            <input type="checkbox" name="is_active" id="eventIsActive" checked
+                                class="w-5 h-5 accent-amber-500 rounded border-white/20 bg-white/5">
+                            <span
+                                class="text-xs font-bold uppercase tracking-widest group-hover:text-amber-500 transition-colors">Active
+                                Status</span>
+                        </label>
                     </div>
                 </div>
 

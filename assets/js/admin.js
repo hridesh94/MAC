@@ -308,11 +308,21 @@ async function renderAdminEvents() {
         if (error) throw error;
 
         const tbody = document.getElementById('adminEventsTable');
-        tbody.innerHTML = events.map(event => `
+        tbody.innerHTML = events.map(event => {
+            const statusBadge = event.is_active
+                ? `<span class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-[10px] font-bold uppercase tracking-widest border border-green-500/20">Active</span>`
+                : `<span class="px-3 py-1 bg-white/10 text-white/40 rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10">Inactive (TBD)</span>`;
+
+            return `
             <tr class="hover:bg-white/5 transition-colors">
                 <td class="p-6">
-                    <div class="font-bold text-lg">${event.title}</div>
-                    <div class="text-xs opacity-60 uppercase tracking-widest">SLUG: ${event.slug}</div>
+                    <div class="flex items-center gap-4">
+                        <div>
+                            <div class="font-bold text-lg">${event.title}</div>
+                            <div class="text-xs opacity-60 uppercase tracking-widest">SLUG: ${event.slug}</div>
+                        </div>
+                        ${statusBadge}
+                    </div>
                 </td>
                 <td class="p-6">
                     <div class="text-sm">${event.date}</div>
@@ -327,7 +337,8 @@ async function renderAdminEvents() {
                     <button onclick="deleteEvent('${event.id}')" class="text-red-500 hover:text-white transition-colors">Delete</button>
                 </td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
     } catch (err) {
         console.error('Error rendering events:', err.message);
     }
@@ -544,6 +555,7 @@ async function openEditEventModal(identifier) {
         form.querySelector('[name="itinerary_dispatch"]').value = event.itinerary_dispatch || '';
         form.querySelector('[name="image"]').value = event.image || '';
         form.querySelector('[name="description"]').value = event.description || '';
+        form.querySelector('[name="is_active"]').checked = event.is_active ?? true;
 
         // Load itinerary phases
         clearItineraryRows();
@@ -617,6 +629,7 @@ async function handleAdminAddEvent(e) {
             itinerary: itineraryPhases,
             image: imageUrl,
             description: formData.get('description'),
+            is_active: formData.get('is_active') === 'on',
             slug: formData.get('title').toLowerCase().replace(/\s+/g, '-')
         };
 
