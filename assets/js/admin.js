@@ -236,20 +236,24 @@ async function renderAdminRegistrations() {
             .neq('status', 'cancelled')
             .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+            console.error('Registration fetch error:', error);
+            throw error;
+        }
 
         const tbody = document.getElementById('adminRegistrationsTable');
         if (!tbody) return;
 
         if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-white/50">No registrations found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-white/50">No registrations found</td></tr>';
             return;
         }
 
         tbody.innerHTML = data.map(reg => {
-            const statusBadge = reg.status === 'confirmed'
+            const isConfirmed = reg.status === 'confirmed';
+            const statusBadge = isConfirmed
                 ? `<span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest border border-primary/20">Confirmed</span>`
-                : `<span class="px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full text-xs font-bold uppercase tracking-widest border border-amber-500/20">Pending Payment</span>`;
+                : `<span class="px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full text-xs font-bold uppercase tracking-widest border border-amber-500/20">Pending Confirmation</span>`;
 
             return `
             <tr class="hover:bg-white/5 transition-colors">
@@ -265,9 +269,9 @@ async function renderAdminRegistrations() {
                     <div class="text-xs opacity-60">${new Date(reg.created_at).toLocaleDateString()}</div>
                 </td>
                 <td class="p-6 text-right">
-                    ${reg.status === 'pending_payment'
+                    ${!isConfirmed
                     ? `<button onclick="confirmRegistration('${reg.id}')" class="text-amber-500 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">Confirm</button>`
-                    : '<span class="text-white/20 text-xs">—</span>'}
+                    : `<button onclick="revokeRegistration('${reg.id}')" class="text-red-500 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">Revoke</button>`}
                 </td>
             </tr>
         `;
@@ -279,7 +283,7 @@ async function renderAdminRegistrations() {
 
 // Confirm Registration Manually
 async function confirmRegistration(regId) {
-    if (!confirm('Are you sure you want to mark this payment as confirmed?')) return;
+    if (!confirm('Are you sure you want to mark this registration as confirmed?')) return;
 
     try {
         const { error } = await supabase
@@ -295,6 +299,24 @@ async function confirmRegistration(regId) {
         console.error('Error confirming registration:', err.message);
         alert('Error: ' + err.message);
     }
+}
+
+// Revoke Registration (set back to pending)
+function revokeRegistration(regId) {
+    openDangerModal(
+        'Revoke Confirmation?',
+        "This will move the registration back to 'Pending Confirmation' status.",
+        'Revoke',
+        async () => {
+            const { error } = await supabase
+                .from('registrations')
+                .update({ status: 'pending_payment' })
+                .eq('id', regId);
+
+            if (error) throw error;
+            // The danger modal handler calls initializeAdminData()
+        }
+    );
 }
 
 // Render admin events table
@@ -439,17 +461,7 @@ async function confirmDangerAction() {
     }
 }
 
-// Helper: get Supabase Edge Function URL and auth headers
-async function getEdgeFunctionConfig() {
-    const SUPABASE_URL = 'https://azmfbhffgqqeqbxmkdqf.supabase.co';
-    const { data: { session } } = await supabase.auth.getSession();
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session?.access_token || ''}`,
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6bWZiaGZmZ3FxZXFieG1rZHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NTc1NjksImV4cCI6MjA4NjIzMzU2OX0.74VBnyYMCfgOH5IQvj1c1-O2GCQTG6ul5bXRgTizJWU'
-    };
-    return { SUPABASE_URL, headers };
-}
+
 
 // Delete Member (Revoke Access) - Uses Danger Modal
 function deleteMember(userId) {
@@ -458,22 +470,13 @@ function deleteMember(userId) {
         "This will permanently delete the member's profile and data.",
         'Revoke',
         async () => {
-            const { SUPABASE_URL, headers } = await getEdgeFunctionConfig();
-            const response = await fetch(`${SUPABASE_URL}/functions/v1/delete-member`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({ userId })
+            const { data, error } = await supabase.functions.invoke('delete-member', {
+                body: { userId }
             });
 
-            if (!response.ok) {
-                let result;
-                const text = await response.text();
-                try {
-                    result = JSON.parse(text);
-                } catch (e) {
-                    throw new Error(`Server returned ${response.status}. Please try again or contact support.`);
-                }
-                throw new Error(result.error || 'Failed to revoke access');
+            if (error) {
+                console.error('Delete member error:', error);
+                throw new Error(error.message || 'Failed to revoke access');
             }
         }
     );
@@ -720,30 +723,18 @@ async function confirmIssueCredential() {
     errorEl.classList.add('hidden');
 
     try {
-        const { SUPABASE_URL, headers } = await getEdgeFunctionConfig();
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/add-member`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ email, password })
+        const { data, error } = await supabase.functions.invoke('add-member', {
+            body: { email, password }
         });
 
-        let result;
-        const text = await response.text();
-
-        try {
-            result = JSON.parse(text);
-        } catch (e) {
-            console.error('Invalid JSON response:', text);
-            throw new Error(`Server returned ${response.status}. Please try again or contact support.`);
+        if (error) {
+            console.error('Issue Credential Error:', error);
+            throw new Error(error.message || 'Failed to create member');
         }
 
-        if (response.ok) {
-            closeIssueCredentialModal();
-            renderAdminMembers();
-            updateAdminStats();
-        } else {
-            throw new Error(result.error || 'Failed to create member');
-        }
+        closeIssueCredentialModal();
+        renderAdminMembers();
+        updateAdminStats();
     } catch (err) {
         console.error('Error creating member:', err);
         errorEl.textContent = err.message || 'Failed to issue credential';

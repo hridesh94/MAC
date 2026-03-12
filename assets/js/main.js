@@ -342,8 +342,8 @@ function showExperience(slug) {
                                             Already Registered
                                         </button>`;
                 } else if (regStatus === 'pending_payment') {
-                    return `<button id="detailParticipationBtn" data-reg-btn="${experience.slug}" data-slug="${experience.slug}" onclick="window.location.href='https://buy.stripe.com/test_bJebJ131T3TW2uF8Wc9Ve00'" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-amber-500 text-black text-sm font-black uppercase tracking-widest transition-all hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/30">
-                                            Complete Payment
+                    return `<button id="detailParticipationBtn" data-reg-btn="${experience.slug}" data-slug="${experience.slug}" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-white/10 border border-white/20 text-white/50 text-sm font-black uppercase tracking-widest cursor-not-allowed" disabled>
+                                            Registration Requested
                                         </button>`;
                 }
                 return `<button id="detailParticipationBtn" data-reg-btn="${experience.slug}" data-slug="${experience.slug}" onclick="event.stopPropagation(); openParticipationModal('${experience.slug}', '${experience.title}', '${experience.date}')" class="inline-flex h-16 min-w-[300px] items-center justify-center rounded-full bg-primary text-white text-sm font-black uppercase tracking-widest transition-all hover-scale hover:shadow-2xl hover:shadow-primary/20">

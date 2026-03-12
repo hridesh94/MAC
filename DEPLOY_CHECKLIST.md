@@ -51,9 +51,11 @@ Go to **Site settings** → **Environment variables** and add:
 |----------|-------|
 | `SUPABASE_URL` | `https://azmfbhffgqqeqbxmkdqf.supabase.co` |
 | `SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6bWZiaGZmZ3FxZXFieG1rZHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NTc1NjksImV4cCI6MjA4NjIzMzU2OX0.74VBnyYMCfgOH5IQvj1c1-O2GCQTG6ul5bXRgTizJWU` |
-| `SUPABASE_SERVICE_ROLE_KEY` | **(Get from Supabase Dashboard → Settings → API → service_role)** |
+| `RESEND_API_KEY` | **re_bQeF7X6L_2SXVCjnNFxFjkmqKAUdbnkoh** (Set in Supabase Edge Functions) |
+| `SENDER_EMAIL` | `onboarding@resend.dev` (Matches Resend sender) |
+| `ADMIN_EMAIL` | `hridesh.775421@pmc.tu.edu.np` (Admin recipient) |
 
-> **Note:** The SERVICE_ROLE_KEY is needed for the `add-member` Netlify function to create users.
+> **Note:** Payment logic has been replaced with an email flow. Ensure these secrets are set in your Supabase project (Authentication/Edge Functions).
 
 ### 2.4 Deploy
 Click **"Deploy site"** and wait ~1 minute.

@@ -38,20 +38,14 @@ async function initializeDashboard() {
         await window.dataInitialized;
     }
 
-    // Handle Stripe return BEFORE rendering
-    await handleStripeSuccess();
-
-    const email = sessionStorage.getItem('userEmail') || 'Member';
-    document.getElementById('memberGreeting').textContent = email.split('@')[0];
-
-    // Fetch fresh registrations (invalidates cache)
+    // Ensure we have the latest registrations from the DB
     await fetchUserRegistrations(true);
 
     // Initial render
     renderAvailableEvents();
     renderMyEvents();
 
-    // Setup Realtime Listener for status updates (e.g., from Webhooks)
+    // Setup Realtime Listener for status updates
     setupRealtimeListener();
     updateDashboardStats();
 }
@@ -104,76 +98,8 @@ async function setupRealtimeListener() {
         .subscribe();
 }
 
-// ─── Stripe return handler ────────────────────────────────────────────────────
-async function handleStripeSuccess() {
-    const pendingSlug = sessionStorage.getItem('pendingEventSlug');
+// --- Stripe removal — logic transitioned to email notification system ---
 
-    // Nothing pending — nothing to do
-    if (!pendingSlug) return;
-
-    const params = new URLSearchParams(window.location.search);
-
-    // If the user explicitly cancelled on Stripe, just clear the pending key
-    // and leave the DB record as pending_payment (they can try again later)
-    const isCancelled = params.get('cancelled') === 'true' || params.get('payment') === 'cancelled';
-    if (isCancelled) {
-        console.log('Payment cancelled by user, keeping pending_payment state.');
-        sessionStorage.removeItem('pendingEventSlug');
-        window.history.replaceState({}, document.title, window.location.origin + window.location.pathname + window.location.hash);
-        return;
-    }
-
-    // At this point: pendingSlug exists and no cancellation — user is back from Stripe.
-    // Attempt to promote pending_payment → confirmed.
-    console.log('Detected return from Stripe for slug:', pendingSlug);
-
-    // Clean the URL
-    window.history.replaceState({}, document.title, window.location.origin + window.location.pathname + window.location.hash);
-
-    try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            console.error('No Supabase session on Stripe return — will retry on next login');
-            return;
-        }
-
-        const { data: event, error: eventError } = await supabase
-            .from('events').select('id').eq('slug', pendingSlug).single();
-        if (eventError || !event) throw new Error('Event not found: ' + pendingSlug);
-
-        // Explicit UPDATE first (avoids upsert creating a duplicate if unique constraint is missing)
-        const { error: updateError } = await supabase.from('registrations')
-            .update({ status: 'confirmed' })
-            .eq('user_id', session.user.id)
-            .eq('event_id', event.id);
-
-        if (updateError) {
-            // Fallback: try upsert in case the pending record somehow doesn't exist yet
-            const { error: upsertError } = await supabase.from('registrations').upsert([
-                { user_id: session.user.id, event_id: event.id, status: 'confirmed' }
-            ], { onConflict: 'user_id, event_id' });
-            if (upsertError) throw upsertError;
-        }
-
-        // Clear pending state NOW (after successful DB write)
-        sessionStorage.removeItem('pendingEventSlug');
-
-        // Update local cache immediately so UI is instant
-        REGISTRATION_CACHE[pendingSlug] = { eventId: event.id, status: 'confirmed' };
-        saveCache();
-
-        // Sync both dashboard card & detail view buttons
-        refreshExperienceUI(pendingSlug);
-
-        // Show success modal
-        showSuccessModal(pendingSlug);
-
-        console.log('Payment confirmed for:', pendingSlug);
-
-    } catch (err) {
-        console.error('Stripe confirmation error:', err.message);
-    }
-}
 
 // ─── Fetch user registrations ─────────────────────────────────────────────────
 async function fetchUserRegistrations(forceRefresh = false) {
@@ -243,9 +169,9 @@ function applyButtonState(btn, slug, status) {
         btn.className = 'flex items-center justify-center rounded-full h-12 px-8 bg-white/10 text-white/50 text-sm font-bold uppercase tracking-widest cursor-not-allowed';
         btn.onclick = null;
     } else if (status === 'pending_payment') {
-        btn.textContent = 'Complete Payment';
-        btn.className = 'flex items-center justify-center rounded-full h-12 px-8 bg-amber-500 text-black text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-amber-500/30 transition-all hover-scale';
-        btn.onclick = (e) => { e.stopPropagation(); triggerCheckout(slug); };
+        btn.textContent = 'Registration Requested';
+        btn.className = 'flex items-center justify-center rounded-full h-12 px-8 bg-white/10 text-white/40 text-sm font-bold uppercase tracking-widest cursor-not-allowed';
+        btn.onclick = null;
     } else {
         const ev = EXPERIENCE_DATA[slug];
         const title = ev?.title || slug;
@@ -271,8 +197,8 @@ function applyBadgeState(badge, status) {
         badge.className = 'absolute top-4 right-4 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg';
         badge.style.display = 'block';
     } else if (status === 'pending_payment') {
-        badge.textContent = 'Payment Pending';
-        badge.className = 'absolute top-4 right-4 bg-amber-500 text-black text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg';
+        badge.textContent = 'Pending Confirmation';
+        badge.className = 'absolute top-4 right-4 bg-white/20 text-white/60 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg backdrop-blur-md';
         badge.style.display = 'block';
     } else {
         badge.style.display = 'none';
@@ -304,7 +230,7 @@ function renderAvailableEvents() {
         if (status === 'confirmed') {
             btnHtml = `<button data-reg-btn="${event.slug}" class="flex items-center justify-center rounded-full h-12 px-8 bg-white/10 text-white/50 text-sm font-bold uppercase tracking-widest cursor-not-allowed" disabled>Already Registered</button>`;
         } else if (status === 'pending_payment') {
-            btnHtml = `<button data-reg-btn="${event.slug}" onclick="event.stopPropagation(); triggerCheckout('${event.slug}')" class="flex items-center justify-center rounded-full h-12 px-8 bg-amber-500 text-black text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-amber-500/30 transition-all hover-scale">Complete Payment</button>`;
+            btnHtml = `<button data-reg-btn="${event.slug}" class="flex items-center justify-center rounded-full h-12 px-8 bg-white/10 text-white/40 text-sm font-bold uppercase tracking-widest cursor-not-allowed" disabled>Registration Requested</button>`;
         } else {
             if (event.is_active === false) {
                 btnHtml = `<button data-reg-btn="${event.slug}" class="flex items-center justify-center rounded-full h-12 px-8 bg-white/10 text-white/40 text-sm font-bold uppercase tracking-widest cursor-not-allowed" disabled>Registration TBD</button>`;
@@ -317,7 +243,7 @@ function renderAvailableEvents() {
         if (status === 'confirmed') {
             badgeHtml = `<div data-reg-badge="${event.slug}" class="absolute top-4 right-4 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">Confirmed</div>`;
         } else if (status === 'pending_payment') {
-            badgeHtml = `<div data-reg-badge="${event.slug}" class="absolute top-4 right-4 bg-amber-500 text-black text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">Payment Pending</div>`;
+            badgeHtml = `<div data-reg-badge="${event.slug}" class="absolute top-4 right-4 bg-white/20 text-white/60 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg backdrop-blur-md">Pending Confirmation</div>`;
         } else {
             badgeHtml = `<div data-reg-badge="${event.slug}" style="display:none"></div>`;
         }
@@ -370,17 +296,17 @@ function renderMyEvents() {
         const isPending = reg.status === 'pending_payment';
 
         const badgeHtml = isPending
-            ? `<div class="absolute top-4 right-4 bg-amber-500 text-black px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Payment Pending</div>`
+            ? `<div class="absolute top-4 right-4 bg-white/20 text-white/60 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest backdrop-blur-md">Pending Confirmation</div>`
             : `<div class="absolute top-4 right-4 bg-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Confirmed</div>`;
 
         const actionsHtml = isPending
             ? `
-                <button onclick="triggerCheckout('${slug}')" class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 bg-amber-500 text-black text-sm font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-amber-500/30 transition-all">
-                    <span class="material-symbols-outlined text-sm">payments</span>
-                    <span>Complete Payment</span>
+                <button class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 bg-white/10 text-white/40 text-sm font-bold uppercase tracking-widest cursor-not-allowed" disabled>
+                    <span class="material-symbols-outlined text-sm">schedule</span>
+                    <span>Awaiting Admin Confirmation</span>
                 </button>
                 <button onclick="triggerCancelParticipation('${event.slug}', '${event.title}', '${event.date}')" class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 border border-white/20 text-white/40 text-[10px] font-bold uppercase tracking-widest hover:text-red-500 hover:border-red-500/50 transition-all">
-                    <span>Cancel</span>
+                    <span>Cancel Request</span>
                 </button>`
             : `
                 <button onclick="downloadCalendarDetail('${slug}')" class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 border-2 border-primary text-primary text-sm font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
@@ -483,51 +409,8 @@ function closeParticipationModal() {
 }
 
 // ─── Confirm participation or cancellation ────────────────────────────────────
-// ─── Trigger Dynamic Checkout ────────────────────────────────────────────────
-async function triggerCheckout(slug) {
-    try {
-        const authInfo = await supabase.auth.getSession();
-        const session = authInfo.data.session;
-        if (!session) throw new Error('User not authenticated');
+// Logic transitioned to send-registration-email Edge Function (Post-Stripe)
 
-        console.log('Initiating dynamic checkout for:', slug);
-
-        // CRITICAL: Save pending slug immediately so we can handle the return 
-        // even if the dynamic session fails and we use the fallback link.
-        sessionStorage.setItem('pendingEventSlug', slug);
-
-        const origin = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
-
-        const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-checkout-session`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session.access_token}`,
-                'apikey': window.SUPABASE_ANON_KEY || SUPABASE_ANON_KEY
-            },
-            body: JSON.stringify({
-                eventSlug: slug,
-                userId: session.user.id,
-                successUrl: `${origin}member.html?payment=success`,
-                cancelUrl: `${origin}member.html?payment=cancelled`,
-            }),
-        });
-
-        if (!response.ok) {
-            console.warn('Backend checkout failed (perhaps missing Stripe key?), falling back to static payment link');
-            window.location.href = 'https://buy.stripe.com/test_bJebJ131T3TW2uF8Wc9Ve00';
-            return;
-        }
-
-        const { url } = await response.json();
-        if (!url) throw new Error('No checkout URL returned from server');
-
-        window.location.href = url;
-    } catch (err) {
-        console.error('Checkout error, falling back to static link:', err);
-        window.location.href = 'https://buy.stripe.com/test_bJebJ131T3TW2uF8Wc9Ve00';
-    }
-}
 
 async function confirmParticipation() {
     if (!pendingEventSlug) return;
@@ -545,7 +428,7 @@ async function confirmParticipation() {
         if (!session) throw new Error('User not authenticated');
 
         const { data: event, error: eventError } = await supabase
-            .from('events').select('id').eq('slug', pendingEventSlug).single();
+            .from('events').select('id, title, date').eq('slug', pendingEventSlug).single();
         if (eventError) throw new Error('Event not found or access denied.');
 
         if (pendingAction === 'cancel') {
@@ -564,60 +447,53 @@ async function confirmParticipation() {
 
         } else {
             // 1. Create a pending_payment record in DB first
+            confirmBtn.textContent = 'Registering...';
             const { error: pendingError } = await supabase.from('registrations').upsert([
                 { user_id: session.user.id, event_id: event.id, status: 'pending_payment' }
             ], { onConflict: 'user_id, event_id' });
-            if (pendingError) throw pendingError;
 
-            // 2. Save to cache + sessionStorage before navigating away
+            if (pendingError) {
+                console.error('DB Upsert Error:', pendingError);
+                throw new Error(pendingError.message || 'Database registration failed. Please try again.');
+            }
+
+            // 2. Trigger Email Notification via Edge Function (Non-blocking)
+            confirmBtn.textContent = 'Notifying admin...';
+            
+            const { data: { session: currentSession } } = await supabase.auth.getSession();
+            console.log('Sending registration. Auth Session:', currentSession ? 'Active' : 'Missing');
+            
+            const payload = {
+                memberName: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+                memberEmail: session.user.email,
+                eventName: event.title,
+                eventDate: event.date
+            };
+
+            try {
+                const { data: emailData, error: emailError } = await supabase.functions.invoke('send-registration-email', {
+                    body: payload,
+                });
+
+                if (emailError) {
+                    console.warn('Email notification error:', emailError);
+                } else {
+                    console.log('Email notification sent successfully:', emailData);
+                }
+            } catch (emailErr) {
+                console.warn('Email notification call failed:', emailErr.message);
+            }
+
+            // 3. Save to cache
             REGISTRATION_CACHE[pendingEventSlug] = { eventId: event.id, status: 'pending_payment' };
             saveCache();
-            sessionStorage.setItem('pendingEventSlug', pendingEventSlug);
 
-            // 3. Sync UI immediately so user sees the state change
+            // 4. Sync UI immediately
             refreshExperienceUI(pendingEventSlug);
             closeParticipationModal();
 
-            // 4. Call the create-checkout-session Edge Function to get a
-            //    dynamic Stripe URL with user_id + event_slug metadata embedded.
-            //    The stripe-webhook function will read this metadata and auto-confirm.
-            confirmBtn.textContent = 'Redirecting to payment...';
-            const origin = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
-            const { data: { session: authSession } } = await supabase.auth.getSession();
-
-            const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-checkout-session`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authSession.access_token}`,
-                    'apikey': window.SUPABASE_ANON_KEY || SUPABASE_ANON_KEY
-                },
-                body: JSON.stringify({
-                    eventSlug: pendingEventSlug,
-                    userId: session.user.id,
-                    successUrl: `${origin}member.html?payment=success`,
-                    cancelUrl: `${origin}member.html?payment=cancelled`,
-                }),
-            });
-
-            if (!response.ok) {
-                // Fallback to static link if edge function fails
-                console.warn('Edge function failed, falling back to static Stripe link');
-                let errorMsg = 'Failed to create checkout session';
-                try {
-                    const errData = await response.json();
-                    if (errData.error) errorMsg += ': ' + errData.error;
-                } catch (e) { }
-                console.warn(errorMsg);
-                window.location.href = 'https://buy.stripe.com/test_bJebJ131T3TW2uF8Wc9Ve00';
-                return;
-            }
-
-            const { url } = await response.json();
-            if (!url) throw new Error('No checkout URL returned from server');
-
-            // 5. Redirect to the dynamic Stripe checkout URL
-            window.location.href = url;
+            // 5. Show success message (it shows regardless of email success)
+            showSuccessModal(pendingEventSlug);
         }
 
     } catch (err) {
@@ -649,9 +525,9 @@ function showSuccessModal(slug) {
         <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
             <span class="material-symbols-outlined text-primary text-5xl">verified</span>
         </div>
-        <h3 class="text-3xl font-serif italic mb-4">Welcome Aboard</h3>
+        <h3 class="text-3xl font-serif italic mb-4">Request Received</h3>
         <p class="text-white/60 text-sm leading-relaxed mb-8">
-            Your participation in <span class="text-white font-medium">${eventName}</span> has been secured. Your digital dossier will be dispatched shortly.
+            Your registration interest in <span class="text-white font-medium">${eventName}</span> has been received. Our team will be in touch shortly with next steps.
         </p>
         <button onclick="document.getElementById('successPaymentModal').remove()"
                 class="w-full rounded-full h-14 bg-primary text-white text-xs font-black uppercase tracking-[0.2em] hover:shadow-2xl hover:shadow-primary/40 transition-all">
