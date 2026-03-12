@@ -22,12 +22,6 @@ Run these SQL scripts **in order** in your Supabase SQL Editor:
 -- This creates the registrations table with RLS policies
 ```
 
-### 1.4 Access Requests Table
-```sql
--- Copy and paste from: access_requests.sql
--- This creates the invite request system
-```
-
 ---
 
 ## Step 2: Deploy to Netlify
@@ -80,10 +74,6 @@ This ensures only admins can create users (invite-only).
 - Try logging in with your admin credentials
 - Verify the Admin Dashboard loads
 
-### 4.2 Test Access Request
-- Click "Request an Invitation" on the login screen
-- Submit an email
-- Check the "Requests" tab in Admin Dashboard
 
 ### 4.3 Test Event Registration
 - Log in as a member
