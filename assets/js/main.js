@@ -537,6 +537,16 @@ document.querySelectorAll('.page-section').forEach(section => {
 
 // Add active class to nav links on scroll
 window.addEventListener('scroll', () => {
+    // Nav dark background on scroll
+    const nav = document.getElementById('nav');
+    if (nav) {
+        if (window.scrollY > 40) {
+            nav.classList.add('on');
+        } else {
+            nav.classList.remove('on');
+        }
+    }
+
     const sections = document.querySelectorAll('section[id]');
     const scrollPosition = window.scrollY + 100;
 

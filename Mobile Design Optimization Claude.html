@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MAC - The Limitless</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#c9293a;
+  --redd:#a81f2e;
+  --w:#f5f2ed;
+  --ow:rgba(245,242,237,0.65);
+  --dim:rgba(245,242,237,0.32);
+  --bg:#0a0a0a;
+  --surf:#111010;
+  --bdr:rgba(245,242,237,0.08);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--w);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;transition:background .4s,border-color .4s;border-bottom:1px solid transparent}
+.nav.on{background:rgba(10,10,10,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:var(--bdr)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo svg{width:30px;height:30px;flex-shrink:0}
+.logo-txt{font-weight:600;font-size:14px;letter-spacing:.26em;color:var(--w)}
+.burger{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:5px;width:40px;height:40px;background:none;border:none;cursor:pointer;padding:0}
+.burger i{display:block;height:1.5px;background:var(--w);border-radius:2px}
+.burger i:nth-child(1){width:22px}
+.burger i:nth-child(2){width:14px}
+.burger i:nth-child(3){width:18px}
+
+/* HERO */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:60px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,1) 0%,rgba(10,10,10,.55) 42%,rgba(10,10,10,.12) 100%),url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;transform:scale(1.05);animation:zoom 14s ease-out forwards}
+.hero-bg::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--red),transparent);opacity:.4}
+@keyframes zoom{from{transform:scale(1.05)}to{transform:scale(1)}}
+.hc{position:relative;z-index:2;padding:0 28px;animation:rise .9s cubic-bezier(.16,1,.3,1) .25s both}
+@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.eb{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.eb::before{content:'';display:block;width:26px;height:1px;background:var(--red);flex-shrink:0}
+.eb span{font-size:9px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--red)}
+.h1{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;font-size:clamp(62px,18.5vw,88px);line-height:.92;color:var(--w);margin-bottom:22px}
+.h1 b{color:var(--red);font-style:normal;font-weight:400}
+.hdesc{font-size:13px;font-weight:300;line-height:1.8;letter-spacing:.03em;color:var(--ow);max-width:285px;margin-bottom:36px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:54px;background:var(--red);color:var(--w);font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;border:none;border-radius:100px;cursor:pointer;transition:background .2s,transform .15s;-webkit-tap-highlight-color:transparent}
+.btn:active{background:var(--redd);transform:scale(.98)}
+.btn svg{width:13px;height:13px;opacity:.75;flex-shrink:0}
+.scroll-hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;animation:fi .5s ease 2.2s forwards}
+.scroll-hint span{font-size:7px;letter-spacing:.3em;color:var(--dim);text-transform:uppercase}
+.sl{width:1px;height:28px;background:linear-gradient(to bottom,rgba(201,41,58,.5),transparent);animation:sd 2s ease-in-out 2.2s infinite}
+@keyframes fi{to{opacity:1}}
+@keyframes sd{0%{transform:scaleY(0);transform-origin:top;opacity:1}50%{transform:scaleY(1);transform-origin:top;opacity:1}51%{transform:scaleY(1);transform-origin:bottom;opacity:1}100%{transform:scaleY(0);transform-origin:bottom;opacity:0}}
+
+/* INNER CIRCLE */
+.ic{position:relative;background:var(--bg);padding:96px 28px 88px;overflow:hidden}
+.ic::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;background:radial-gradient(circle,rgba(201,41,58,.09) 0%,transparent 70%);pointer-events:none}
+.ic::after{content:'';position:absolute;top:0;left:28px;right:28px;height:1px;background:linear-gradient(to right,var(--red),transparent);opacity:.35}
+.ic-h{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;font-size:clamp(42px,12.5vw,60px);line-height:1.02;color:var(--w);margin-bottom:28px}
+.ic-div{width:36px;height:1px;background:var(--bdr);margin-bottom:24px}
+.ic-p{font-size:14px;font-weight:300;line-height:1.85;letter-spacing:.02em;color:var(--ow);margin-bottom:28px}
+.ic-note{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;font-weight:400;line-height:1.7;color:var(--dim);padding-top:24px;border-top:1px solid var(--bdr)}
+
+/* PILLARS */
+.pillars{background:var(--surf);padding:72px 28px 80px}
+.seb{display:flex;align-items:center;gap:12px;margin-bottom:40px}
+.seb::before{content:'';display:block;width:26px;height:1px;background:var(--red);flex-shrink:0}
+.seb span{font-size:9px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--red)}
+.pillar{display:flex;align-items:flex-start;gap:20px;padding:26px 0;border-bottom:1px solid var(--bdr)}
+.pillar:first-of-type{border-top:1px solid var(--bdr)}
+.pnum{font-family:'Playfair Display',serif;font-style:italic;font-size:30px;font-weight:400;color:var(--red);line-height:1;flex-shrink:0;width:34px;padding-top:3px}
+.ptit{font-size:10.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--w);margin-bottom:8px}
+.pdesc{font-size:13px;font-weight:300;line-height:1.75;color:var(--ow);letter-spacing:.02em}
+
+/* FOOTER */
+.footer{background:var(--bg);padding:60px 28px 44px;border-top:1px solid var(--bdr)}
+.ft{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:44px}
+.fb{display:flex;flex-direction:column;gap:12px}
+.flr{display:flex;align-items:center;gap:10px}
+.flr svg{width:24px;height:24px;flex-shrink:0}
+.flr-txt{font-weight:600;font-size:13px;letter-spacing:.26em;color:var(--w)}
+.ftag{font-size:11px;font-weight:300;color:var(--dim);letter-spacing:.03em;line-height:1.65}
+.fcol{display:flex;flex-direction:column;align-items:flex-end;gap:14px}
+.flbl{font-size:8px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--red)}
+.flink{font-size:12px;font-weight:400;color:var(--ow);text-decoration:none;letter-spacing:.05em;transition:color .2s}
+.flink:hover{color:var(--w)}
+.fconn{margin-bottom:44px}
+.femail{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--bdr);color:var(--ow);text-decoration:none;transition:border-color .2s,color .2s;margin-top:14px}
+.femail:hover{border-color:var(--red);color:var(--red)}
+.femail svg{width:16px;height:16px}
+.fb2{padding-top:24px;border-top:1px solid var(--bdr);display:flex;flex-direction:column;gap:14px}
+.fcopy{font-size:9px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase}
+.flegal{display:flex;gap:22px}
+.flegal a{font-size:9px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;text-decoration:none;transition:color .2s}
+.flegal a:hover{color:var(--red)}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
+.rv.on{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}
+.d2{transition-delay:.2s}
+.d3{transition-delay:.3s}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a class="logo" href="#">
+    <svg viewBox="0 0 30 30" fill="none">
+      <circle cx="11" cy="15" r="8.2" stroke="#c9293a" stroke-width="1.4"/>
+      <circle cx="19" cy="15" r="8.2" stroke="#c9293a" stroke-width="1.4"/>
+    </svg>
+    <span class="logo-txt">MAC</span>
+  </a>
+  <button class="burger" aria-label="Menu">
+    <i></i><i></i><i></i>
+  </button>
+</header>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hc">
+    <div class="eb"><span>Members Access Club</span></div>
+    <h1 class="h1">The<br>Limit<b>less</b></h1>
+    <p class="hdesc">Experiences curated for those who operate beyond limits. The intersection of luxury and peak performance.</p>
+    <a href="#" class="btn">
+      Login to Membership
+      <svg viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+  <div class="scroll-hint">
+    <div class="sl"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<section class="ic">
+  <div class="eb rv"><span>Admissions</span></div>
+  <h2 class="ic-h rv d1">The Inner<br>Circle</h2>
+  <div class="ic-div rv d2"></div>
+  <p class="ic-p rv d2">Membership is by invitation only. Access credentials are issued exclusively by our administration to those who embody the MAC ethos.</p>
+  <p class="ic-note rv d3">If you have received an invitation, your credentials have been provided directly.</p>
+</section>
+
+<section class="pillars">
+  <div class="seb rv"><span>What We Stand For</span></div>
+  <div class="pillar rv d1">
+    <span class="pnum">I</span>
+    <div><p class="ptit">Exclusivity</p><p class="pdesc">Access is not purchased — it is conferred. Every member is personally selected.</p></div>
+  </div>
+  <div class="pillar rv d2">
+    <span class="pnum">II</span>
+    <div><p class="ptit">Discretion</p><p class="pdesc">What happens within the MAC remains within it. Privacy is a founding principle.</p></div>
+  </div>
+  <div class="pillar rv d3">
+    <span class="pnum">III</span>
+    <div><p class="ptit">Excellence</p><p class="pdesc">We curate only the finest — experiences, venues, and connections that match your standard.</p></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="ft rv">
+    <div class="fb">
+      <div class="flr">
+        <svg viewBox="0 0 30 30" fill="none"><circle cx="11" cy="15" r="8.2" stroke="#c9293a" stroke-width="1.4"/><circle cx="19" cy="15" r="8.2" stroke="#c9293a" stroke-width="1.4"/></svg>
+        <span class="flr-txt">MAC</span>
+      </div>
+      <p class="ftag">Established 2026.<br>Member admissions only.</p>
+    </div>
+    <div class="fcol">
+      <span class="flbl">Quick Links</span>
+      <a href="#" class="flink">Membership</a>
+    </div>
+  </div>
+  <div class="fconn rv d1">
+    <span class="flbl">Connect</span>
+    <a href="#" class="femail" aria-label="Contact">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="5" width="16" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 6.5l8 5.5 8-5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </a>
+  </div>
+  <div class="fb2 rv d2">
+    <p class="fcopy">2026 MAC. All rights reserved.</p>
+    <nav class="flegal">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Inquiries</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var n=document.getElementById('nav');
+  window.addEventListener('scroll',function(){n.classList[window.scrollY>40?'add':'remove']('on')},{passive:true});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}})},{threshold:0.12});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+}());
+</script>
+</body>
+</html>

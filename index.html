@@ -45,52 +45,36 @@
     class="bg-background-light dark:bg-background-dark font-display text-charcoal dark:text-white transition-colors duration-300 smooth-scroll">
 
     <!-- Fixed Navigation -->
-    <header
-        class="fixed top-0 left-0 right-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-blush/20">
-        <div class="max-w-[1200px] mx-auto px-6 lg:px-10">
-            <div class="flex items-center justify-between py-5">
-                <!-- Logo -->
-                <a href="#" class="flex items-center gap-1 group">
-                    <div class="text-primary transition-transform group-hover:scale-110 duration-300"
-                        style="width:28px;height:28px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="400 432 300 192" fill="currentColor" width="28"
-                            height="28" aria-hidden="true">
-                            <path
-                                d="M546.576 606.024c-5.543 2.025-10.69 4.343-15.987 6.246-32.432 11.65-62.68 7.02-90.257-13.289-20.49-15.089-32.482-35.742-36.926-60.804-7.317-41.265 14.935-83.598 53.083-101.327 28.464-13.228 56.648-12.572 84.662 1.142 3.285 1.607 5.949 1.706 9.337-.014 58.317-29.605 127.777 5.89 137.927 70.377 8.269 52.53-29.037 102.155-81.726 109.124-21.293 2.816-41.01-1.505-60.113-11.455m-11.572-161.013c-39.008-18.993-85.436-6.448-109.703 30.04-22.896 34.426-18.3 80.89 12.84 111.032 30.576 29.597 77.907 27.024 98.12 13.394-1.495-3.156-4.73-4.524-7.098-6.732-43.17-40.257-39.06-108.806 4.459-143.681 1.074-.86 3.49-1.36 1.382-4.053m24.246-1.414c-1.233.756-2.87.993-3.613 3.103 23.927 19.522 37.275 44.878 37.31 75.996.033 31.3-13.12 56.878-37.865 76.33 18.546 13.891 64.754 16.09 94.605-9.428 32.515-27.794 40.779-75.61 18.749-111.358-22.982-37.293-68.935-52.082-109.186-34.643m-1.66 113.313c4.151 3.956 7.772 8.51 12.518 11.786 6.724-7.433 6.752-8.373.3-14.862-17.717-17.818-35.446-35.625-53.226-53.381-1.552-1.55-2.887-3.55-5.058-4.203-4.091 7.336-3.062 12.805 3.187 18.638 14.345 13.392 27.908 27.623 42.28 42.022m-36.495-66.492 58.285 58.084c4.528-9.94 4.356-11.013-2.097-17.453-16.964-16.932-33.916-33.875-50.896-50.79-1.383-1.378-2.535-3.112-4.582-3.628-6.026 5.132-6.27 7.955-.71 13.787m32.137-13.141c-4.476-4.479-8.905-9.005-13.44-13.423-4.702-4.58-5.686-4.289-9.75.634-2.568 3.111-.639 4.864 1.224 6.738a22219 22219 0 0 0 49.416 49.542c.647.648 1.324 1.626 2.907.828.376-7.57.27-14.748-6.379-20.682-8.19-7.31-15.693-15.388-23.978-23.637m-4.183 85.176-40.747-40.66-1.208.718c1.824 5.86-.863 12.615 4.345 17.819 14.138 14.126 28.283 28.247 42.303 42.49 3.08 3.128 4.848 1.089 6.974-.957 2.198-2.115 4.054-4.023.904-6.959-4.14-3.858-8.055-7.959-12.571-12.45m-11.676 17.673-20.106-21.855-1.5 1.469c6.33 12.991 14.971 24.125 26.724 32.738 2.083 1.527 4.249 2.995 6.661-2.021-3.54-3.085-7.41-6.458-11.78-10.331m23.07-117.065c-3.9-3.374-7.75-6.805-11.726-10.086-1.209-.998-2.856-2.45-4.326-.567-1.353 1.734.626 2.657 1.574 3.617a4539 4539 0 0 0 25.738 25.837c.692.69 1.255 1.908 2.884 1.567-3.519-7.544-8.238-13.94-14.145-20.368" />
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-bold leading-tight tracking-widest">MAC</h2>
-                </a>
+    <header class="nav-header fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 lg:px-10 h-16 md:h-20" id="nav">
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-[10px] group no-underline" onclick="showMainSite()">
+            <svg viewBox="0 0 30 30" fill="none" class="opt-logo-svg group-hover:scale-110 transition-transform duration-300">
+                <circle cx="11" cy="15" r="8.2" stroke="#c9293a" stroke-width="1.4"/>
+                <circle cx="19" cy="15" r="8.2" stroke="#c9293a" stroke-width="1.4"/>
+            </svg>
+            <span class="opt-logo-txt">MAC</span>
+        </a>
 
-                <!-- Desktop Navigation -->
-                <nav class="hidden md:flex items-center gap-9">
-                    <a class="nav-link text-sm font-medium hover:text-primary transition-colors" href="#home"
-                        onclick="showMainSite()">Home</a>
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-9">
+            <a class="nav-link text-sm font-medium hover:text-[#c9293a] transition-colors text-[#f5f2ed]" href="#home"
+                onclick="showMainSite()">Home</a>
 
-                    <a class="nav-link members-only text-sm font-medium hover:text-primary transition-colors"
-                        href="#events" style="display: none;">Events</a>
-                    <a class="nav-link text-sm font-medium hover:text-primary transition-colors"
-                        href="#membership">Membership</a>
-                </nav>
+            <a class="nav-link members-only text-sm font-medium hover:text-[#c9293a] transition-colors text-[#f5f2ed]"
+                href="#events" style="display: none;">Events</a>
+            <a class="nav-link text-sm font-medium hover:text-[#c9293a] transition-colors text-[#f5f2ed]"
+                href="#membership">Membership</a>
+            
+            <button onclick="navigateTo('login')"
+                class="flex cursor-pointer items-center justify-center rounded-full h-[38px] px-6 border border-white/20 text-white text-xs font-semibold tracking-widest uppercase hover:bg-white hover:text-black transition-colors">
+                Login
+            </button>
+        </nav>
 
-                <!-- CTA Buttons -->
-                <div class="hidden md:flex items-center gap-4">
-                    <button onclick="navigateTo('login')"
-                        class="flex min-w-[120px] cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold leading-normal hover:opacity-90 transition-opacity">
-                        <span>Member Login</span>
-                    </button>
-                    <div
-                        class="flex items-center justify-center rounded-full size-10 border border-blush/30 bg-primary/5 text-primary">
-                        <i class="fa-regular fa-user text-lg"></i>
-                    </div>
-                </div>
-
-                <!-- Mobile Menu Button -->
-                <button onclick="toggleMobileMenu()" class="md:hidden text-primary">
-                    <span class="material-symbols-outlined text-3xl">menu</span>
-                </button>
-            </div>
-        </div>
+        <!-- Mobile Menu Button -->
+        <button onclick="toggleMobileMenu()" class="burger md:hidden" aria-label="Menu">
+            <i></i><i></i><i></i>
+        </button>
     </header>
 
     <!-- Mobile Menu -->
@@ -128,35 +112,20 @@
         <main class="pt-20">
 
             <!-- HOME SECTION -->
-            <section id="home"
-                class="page-section active min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                    style='background-image: linear-gradient(rgba(24, 17, 18, 0.6) 0%, rgba(24, 17, 18, 0.8) 100%), url("https://azmfbhffgqqeqbxmkdqf.supabase.co/storage/v1/object/sign/Images/kahl-orr-MPdl02hySb0-unsplash.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9kMGEwNjY0NC0xYWI4LTQ1YWYtYWE0NS1kY2QwNDYzZjc2ZjUiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJJbWFnZXMva2FobC1vcnItTVBkbDAyaHlTYjAtdW5zcGxhc2guanBnIiwiaWF0IjoxNzcwNzA5MzA3LCJleHAiOjE4MDIyNDUzMDd9.HnQAzeP6Egx4hJ8bnxjdnigPhB8Tk4fGhjefwD2gDNo");'>
-                </div>
-
-                <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
-                    <h1
-                        class="hero-title text-white text-8xl md:text-9xl font-light italic font-serif leading-tight tracking-tight mb-6 fade-in-up opacity-0">
-                        The Limitless
-                    </h1>
-                    <h2
-                        class="text-white/80 text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto mb-8 fade-in-up opacity-0 stagger-2">
-                        Experiences curated for those who operate beyond limits. The intersection of luxury and peak
-                        performance.
-                    </h2>
-                </div>
-
-                <!-- Shimmer Login Button -->
-                <div class="absolute bottom-40 left-0 right-0 flex justify-center fade-in-up opacity-0 stagger-3 z-10">
-                    <button onclick="navigateTo('login')" class="shimmer-button">
-                        <span class="relative z-10">Login to Membership</span>
+            <section id="home" class="page-section active hero-opt">
+                <div class="hero-opt-bg"></div>
+                <div class="hero-opt-content">
+                    <div class="hero-opt-eyebrow"><span>Members Access Club</span></div>
+                    <h1 class="hero-opt-h1">The<br>Limit<b>less</b></h1>
+                    <p class="hero-opt-desc">Experiences curated for those who operate beyond limits. The intersection of luxury and peak performance.</p>
+                    <button onclick="navigateTo('login')" class="hero-opt-btn">
+                        Login to Membership
+                        <svg viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                 </div>
-
-                <!-- Scroll Indicator -->
-                <div
-                    class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce fade-in-up opacity-0 stagger-4">
-                    <span class="material-symbols-outlined text-white text-3xl">keyboard_double_arrow_down</span>
+                <div class="hero-scroll-hint">
+                    <div class="scroll-line"></div>
+                    <span>Scroll</span>
                 </div>
             </section>
 
