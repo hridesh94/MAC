@@ -48,6 +48,32 @@ async function initializeDashboard() {
     // Setup Realtime Listener for status updates
     setupRealtimeListener();
     updateDashboardStats();
+    setMemberGreeting();
+}
+
+/**
+ * Fech member's name and update the greeting
+ */
+async function setMemberGreeting() {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        
+        let memberName = 'Member';
+        if (session.user.user_metadata?.full_name) {
+            memberName = session.user.user_metadata.full_name.split(' ')[0];
+        } else if (session.user.email) {
+            memberName = session.user.email.split('@')[0];
+            memberName = memberName.charAt(0).toUpperCase() + memberName.slice(1);
+        }
+        
+        const greetingEl = document.getElementById('memberGreeting');
+        if (greetingEl) {
+            greetingEl.textContent = memberName;
+        }
+    } catch (err) {
+        console.warn('Could not set member greeting:', err);
+    }
 }
 
 /**
