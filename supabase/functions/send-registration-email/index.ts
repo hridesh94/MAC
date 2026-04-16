@@ -14,11 +14,10 @@ Deno.serve(async (req) => {
     let { memberName, memberEmail, eventName, eventDate } = await req.json();
     memberEmail = memberEmail?.trim().toLowerCase();
 
-    // Use environment variables or fallback to provided key for initial testing
-    // RECOMMENDED: Set these in Supabase Dashboard -> Project Settings -> Edge Functions -> Secrets
-    const resendApiKey = Deno.env.get('RESEND_API_KEY') || 're_bQeF7X6L_2SXVCjnNFxFjkmqKAUdbnkoh';
-    const senderEmail = 'Resend <onboarding@resend.dev>';
-    const adminEmail = (Deno.env.get('ADMIN_EMAIL') || 'hridesh.775421@pmc.tu.edu.np').trim().toLowerCase();
+    // Use environment variables — set these in Supabase Dashboard -> Project Settings -> Edge Functions -> Secrets
+    const resendApiKey = Deno.env.get('RESEND_API_KEY') || 're_LdJ8WmHJ_7T9oE4qEoCGTiFD6TLUSfHJZ';
+    const senderEmail = Deno.env.get('SENDER_EMAIL') || 'MAC <noreply@mail.joinmac.club>';
+    const adminEmail = (Deno.env.get('ADMIN_EMAIL') || 'joinmac.club@gmail.com').trim().toLowerCase();
 
     console.log(`Using Sender: ${senderEmail}, Admin: ${adminEmail}, Member: ${memberEmail}`);
 
@@ -28,17 +27,41 @@ Deno.serve(async (req) => {
     const adminResponse = await resend.emails.send({
       from: senderEmail,
       to: adminEmail,
-      subject: `Registration Request — ${eventName}`,
+      subject: `New Registration Request — ${eventName}`,
       html: `
-        <div style="font-family: 'Inter', sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px;">
-          <h2 style="font-family: 'Playfair Display', serif; font-style: italic; color: #d41132; margin-bottom: 24px;">New Registration Request</h2>
-          <p style="font-size: 16px;"><strong>${memberName}</strong> (${memberEmail}) has requested to join:</p>
-          <div style="background: #fdf2f4; padding: 24px; border-radius: 8px; border-left: 4px solid #d41132; margin: 24px 0;">
-            <p style="margin: 0; font-size: 18px; font-weight: bold;">${eventName}</p>
-            <p style="margin: 8px 0 0; opacity: 0.7;">${eventDate}</p>
+        <div style="font-family: 'Inter', sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 600px; margin: 0 auto; padding: 32px 24px; border: 1px solid #eee; border-radius: 12px;">
+          
+          <div style="border-bottom: 2px solid #d41132; padding-bottom: 16px; margin-bottom: 28px;">
+            <p style="margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #d41132;">MAC — The Limitless Club</p>
+            <h2 style="margin: 8px 0 0; font-size: 22px; font-weight: 700; color: #1a1a1a;">New Registration Request</h2>
           </div>
-          <p style="font-size: 14px; color: #666; margin-top: 32px; border-top: 1px solid #eee; pt: 16px;">
-            Please follow up with the member within 24 hours to confirm details.
+
+          <p style="font-size: 14px; color: #555; margin-bottom: 24px;">A member has requested to join an upcoming experience and requires your confirmation.</p>
+
+          <div style="background: #fdf2f4; padding: 20px 24px; border-radius: 8px; border-left: 4px solid #d41132; margin-bottom: 24px;">
+            <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #d41132;">Event</p>
+            <p style="margin: 0; font-size: 20px; font-weight: 700; color: #1a1a1a;">${eventName}</p>
+            <p style="margin: 6px 0 0; font-size: 14px; color: #777;">${eventDate}</p>
+          </div>
+
+          <div style="background: #f8f8f8; padding: 20px 24px; border-radius: 8px; margin-bottom: 28px;">
+            <p style="margin: 0 0 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #555;">Member Details</p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 6px 0; font-size: 12px; color: #999; width: 110px;">Name</td>
+                <td style="padding: 6px 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">${memberName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; font-size: 12px; color: #999;">Email</td>
+                <td style="padding: 6px 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">
+                  <a href="mailto:${memberEmail}" style="color: #d41132; text-decoration: none;">${memberEmail}</a>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <p style="font-size: 13px; color: #888; border-top: 1px solid #eee; padding-top: 20px; margin: 0;">
+            Please review and confirm or reject this request via the MAC admin panel. Follow up with the member within 24 hours.
           </p>
         </div>
       `,
