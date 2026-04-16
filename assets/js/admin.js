@@ -385,7 +385,10 @@ async function renderAdminMembers() {
         tbody.innerHTML = members.map(member => `
             <tr class="hover:bg-white/5 transition-colors">
                 <td class="p-6">
-                    <div class="font-bold">${member.email}</div>
+                    ${member.full_name
+                        ? `<div class="font-bold">${member.full_name}</div><div class="text-xs opacity-50 mt-0.5">${member.email}</div>`
+                        : `<div class="font-bold">${member.email}</div>`
+                    }
                 </td>
                 <td class="p-6">
                     <span class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-xs font-bold uppercase tracking-widest border border-green-500/20">
@@ -682,11 +685,13 @@ function openAddMemberModal(prefillEmail = '') {
 // Issue Credential Modal Logic
 function openIssueCredentialModal(prefillEmail = '') {
     const modal = document.getElementById('issueCredentialModal');
+    const fullNameInput = document.getElementById('newMemberFullName');
     const emailInput = document.getElementById('newMemberEmail');
     const passwordInput = document.getElementById('newMemberPassword');
     const errorEl = document.getElementById('issueCredentialError');
 
     // Reset fields
+    if (fullNameInput) fullNameInput.value = '';
     emailInput.value = prefillEmail || '';
     passwordInput.value = '';
     errorEl.textContent = '';
@@ -700,7 +705,8 @@ function closeIssueCredentialModal() {
 }
 
 async function confirmIssueCredential() {
-    const email = document.getElementById('newMemberEmail').value;
+    const fullName = (document.getElementById('newMemberFullName')?.value || '').trim();
+    const email = document.getElementById('newMemberEmail').value.trim();
     const password = document.getElementById('newMemberPassword').value;
     const errorEl = document.getElementById('issueCredentialError');
     const confirmBtn = document.querySelector('#issueCredentialModal button[onclick="confirmIssueCredential()"]');
@@ -723,13 +729,26 @@ async function confirmIssueCredential() {
     errorEl.classList.add('hidden');
 
     try {
-        const { data, error } = await supabase.functions.invoke('add-member', {
-            body: { email, password }
-        });
+        const body = { email, password };
+        if (fullName) body.fullName = fullName;
+
+        const { data, error } = await supabase.functions.invoke('add-member', { body });
 
         if (error) {
             console.error('Issue Credential Error:', error);
-            throw new Error(error.message || 'Failed to create member');
+            // Try to extract a meaningful message from the response body
+            let msg = error.message || 'Failed to create member';
+            try {
+                const parsed = typeof error.context === 'string'
+                    ? JSON.parse(error.context)
+                    : error.context;
+                if (parsed?.error) msg = parsed.error;
+            } catch (_) {}
+            throw new Error(msg);
+        }
+
+        if (data?.error) {
+            throw new Error(data.error);
         }
 
         closeIssueCredentialModal();

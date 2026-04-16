@@ -52,21 +52,44 @@ async function initializeDashboard() {
 }
 
 /**
- * Fech member's name and update the greeting
+ * Fetch member's name and update the greeting.
+ * Priority: auth metadata full_name → profiles table full_name → email username
  */
 async function setMemberGreeting() {
     try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
-        
+
         let memberName = 'Member';
+
+        // 1. Check auth user_metadata first (set at credential issuance)
         if (session.user.user_metadata?.full_name) {
             memberName = session.user.user_metadata.full_name.split(' ')[0];
-        } else if (session.user.email) {
-            memberName = session.user.email.split('@')[0];
-            memberName = memberName.charAt(0).toUpperCase() + memberName.slice(1);
+        } else {
+            // 2. Fallback: check profiles table (for existing members)
+            try {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('full_name')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (profile?.full_name) {
+                    memberName = profile.full_name.split(' ')[0];
+                } else if (session.user.email) {
+                    // 3. Last resort: derive from email
+                    const raw = session.user.email.split('@')[0];
+                    memberName = raw.charAt(0).toUpperCase() + raw.slice(1);
+                }
+            } catch (_) {
+                // Profiles query failed — fall back to email
+                if (session.user.email) {
+                    const raw = session.user.email.split('@')[0];
+                    memberName = raw.charAt(0).toUpperCase() + raw.slice(1);
+                }
+            }
         }
-        
+
         const greetingEl = document.getElementById('memberGreeting');
         if (greetingEl) {
             greetingEl.textContent = memberName;
